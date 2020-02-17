@@ -58,7 +58,9 @@ namespace ChessInstaller
                 return;
             }
             setUpdate("Registering web protocol");
-            var key = Registry.ClassesRoot.CreateSubKey("chess", true);
+            var main = Registry.CurrentUser.CreateSubKey("Software");
+            var cls = main.CreateSubKey("Classes");
+            var key = cls.CreateSubKey("chess", true);
             key.SetValue("", "URL:chess Protocol");
             key.SetValue("URL Protocol", "");
             var keyShell = key.CreateSubKey("shell");
@@ -177,7 +179,12 @@ namespace ChessInstaller
                 Directory.Delete(localPath, true);
             }
             catch { }
-            Registry.ClassesRoot.DeleteSubKeyTree("chess");
+            var k = Registry.CurrentUser.OpenSubKey("Software").OpenSubKey("Classes", true);
+            try
+            {
+                k.DeleteSubKeyTree("chess");
+            }
+            catch { }
             var che = Registry.CurrentUser.CreateSubKey("CheAle14");
             che.DeleteSubKey("ChessClient");
             setUpdate("Program uninstalled");
@@ -197,7 +204,10 @@ namespace ChessInstaller
         {
             if(e.Cancelled || e.Error != null)
             {
-                setUpdate("Failed: " + (e.Error?.Message ?? "Cancelled"));
+                string err = null;
+                err = e.Error?.InnerException?.Message ?? err;
+                err = e.Error?.Message ?? "Cancelled";
+                setUpdate("Failed: " + err);
             } else
             {
                 setPercentage(100, formatBytes(lastKnown));
