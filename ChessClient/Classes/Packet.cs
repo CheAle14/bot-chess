@@ -52,13 +52,13 @@ namespace ChessClient.Classes
         #region Server -> Client Messages
         /// <summary>
         /// Sends the current status of the game.
-        /// Content: <see cref="OnlineGame"/>
+        /// Content: Game content
         /// </summary>
         GameStatus,
 
         /// <summary>
         /// Sends full information of a player.
-        /// Content: <see cref="ChessPlayer"/>
+        /// Content: ChessPlayer
         /// </summary>
         PlayerIdent,
 
@@ -76,15 +76,21 @@ namespace ChessClient.Classes
 
         /// <summary>
         /// Orders Client to reflect an update to a Piece,
-        /// Content <see cref="ChessPiece"/>
+        /// Content: Full Chess piece
         /// </summary>
         PieceUpdated,
 
         /// <summary>
         /// Orders Client to reflec an update to a Location
-        /// Content: <see cref="ChessButton"/> Location
+        /// Content: Full ChessLocation
         /// </summary>
         LocationUpdated,
+
+        /// <summary>
+        /// Informs Clients that a new Player has joined
+        /// Content: Full ChessPlayer, and mode
+        /// </summary>
+        ConnectionMade,
 
         #endregion
 

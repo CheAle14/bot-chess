@@ -9,8 +9,7 @@ namespace ChessClient.Classes
     public class APIObject
     {
         internal MLAPI API { get; set; }
-
-        public 
+        
     }
     public class APIObject<T> : APIObject
     {

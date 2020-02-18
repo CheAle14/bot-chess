@@ -117,7 +117,10 @@ namespace ChessClient
             Client.OnClose += Client_OnClose;
             Client.OnError += Client_OnError;
             Client.Connect();
-            Client.Send($"{Parser.Token}/{(mode == StartMode.Join ? "join" : "spectate")}");
+            var jobj = new JObject();
+            jobj["token"] = Parser.Token;
+            jobj["mode"] = mode == StartMode.Join ? "join" : "spectate";
+            Send(new Packet(PacketId.ConnRequest, jobj));
         }
 
         public void Send(Packet p)
