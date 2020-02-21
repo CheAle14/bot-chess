@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace ChessClient.Classes
 {
@@ -23,16 +24,13 @@ namespace ChessClient.Classes
 
         void parse()
         {
+            MessageBox.Show(Argument, "Parse");
             var strip = Argument.Substring("chess://".Length);
             var split = strip.Split('/');
             if(Enum.TryParse<StartMode>(split[0], true, out var mode))
             {
                 Mode = mode;
                 Token = split[1];
-                if(mode != StartMode.Create)
-                {
-                    GameId = split[2];
-                }
             }
         }
     }

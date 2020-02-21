@@ -153,7 +153,7 @@ namespace ChessInstaller
         }
 
         public WebClient Downloader;
-        string url = "https://github.com/CheAle14/bot-chess/releases/download/v0.1/ChessInstaller.exe";
+        string url = "https://github.com/CheAle14/bot-chess/releases/download/v0.2/ChessClient.exe";
         string localPath = "";
         long lastKnown;
 

@@ -1,4 +1,5 @@
 ﻿using ChessClient.Classes;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -17,11 +18,20 @@ namespace ChessClient
         {
             Main = main;
             InitializeComponent();
+            UpdateUI();
+        }
+
+        public void UpdateUI()
+        {
+            lblWhite.Text = Main.Game.White?.Name ?? "Waiting for White";
+            lblBlack.Text = Main.Game.Black?.Name ?? "Waiting for Black";
+            var wait = Main.Game?.Waiting ?? PlayerSide.None;
+            lblWhite.ForeColor = wait == PlayerSide.White ? Color.Red : Color.FromKnownColor(KnownColor.ControlText);
+            lblBlack.ForeColor = wait == PlayerSide.Black ? Color.Red : Color.FromKnownColor(KnownColor.ControlText);
         }
 
         public StartForm Main;
         public GameBoard Board;
-        public OnlineGame Game;
 
         private void GameForm_Load(object sender, EventArgs e)
         {
@@ -34,6 +44,7 @@ namespace ChessClient
         }
 
         public ChessButton firstClick;
+        bool handlingMove = false;
         public void Btn_Click(object sender, EventArgs e)
         {
             if (sender is ChessButton btn)
@@ -48,7 +59,9 @@ namespace ChessClient
                     MessageBox.Show(move);
                     return;
                 }
-                if(Game.Waiting != Main.Self.Side)
+                if(Main.Game.Waiting != Main.Self.Side)
+                    return;
+                if (handlingMove)
                     return;
                 if (firstClick == null)
                 {
@@ -69,12 +82,10 @@ namespace ChessClient
                     }
                     else
                     {
-                        var piece = firstClick.PieceHere;
-                        firstClick.PieceHere = null;
-                        piece.Location = btn;
-                        btn.PieceHere = piece;
-                        piece.HasMoved = true;
-                        Board.Evaluate();
+                        var jobj = new JObject();
+                        jobj["from"] = firstClick.Name;
+                        jobj["to"] = btn.Name;
+                        StartForm.Send(new Packet(PacketId.MoveRequest, jobj));
                     }
                     firstClick = null;
                 }
@@ -92,6 +103,7 @@ namespace ChessClient
             toBtn.PieceHere = fromBtn.PieceHere;
             if (fromBtn.PieceHere != null)
                 fromBtn.PieceHere.Location = toBtn;
+            Main.Game.Waiting = (PlayerSide)((int)Main.Game.Waiting ^ 0b11);
             Board.Evaluate();
         }
     

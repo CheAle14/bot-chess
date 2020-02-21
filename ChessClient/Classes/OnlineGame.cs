@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 
 namespace ChessClient.Classes
 {
@@ -11,5 +12,21 @@ namespace ChessClient.Classes
         public ChessPlayer White { get; set; }
         public ChessPlayer Black { get; set; }
         public PlayerSide Waiting { get; set; }
+
+        public override void FromJson(JObject json)
+        {
+            var wId = json["white"].ToObject<int>();
+            var bId = json["black"].ToObject<int>();
+            if(wId != 0)
+                White = StartForm.GetPlayer(wId);
+            if (bId != 0)
+                Black = StartForm.GetPlayer(bId);
+            Waiting = json["wait"].ToObject<PlayerSide>();
+        }
+
+        public override JObject ToJson()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

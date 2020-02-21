@@ -21,7 +21,7 @@ namespace ChessClient.Classes
         {
             var jobj = new JObject();
             jobj["id"] = Id.ToString();
-            jobj["payload"] = Content.ToString();
+            jobj["content"] = Content.ToString();
             return jobj.ToString();
         }
     }

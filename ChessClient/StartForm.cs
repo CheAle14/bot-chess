@@ -24,10 +24,10 @@ namespace ChessClient
             InitializeComponent();
         }
 
-        Dictionary<int, ChessPlayer> Players = new Dictionary<int, ChessPlayer>();
+        static Dictionary<int, ChessPlayer> Players = new Dictionary<int, ChessPlayer>();
 
-        AutoResetEvent getPlayerEvent;
-        public ChessPlayer GetPlayer(int id)
+        static AutoResetEvent getPlayerEvent = new AutoResetEvent(false);
+        public static ChessPlayer GetPlayer(int id)
         {
             if (Players.TryGetValue(id, out var p))
                 return p;
@@ -41,7 +41,7 @@ namespace ChessClient
         }
 
 
-        public WebSocketSharp.WebSocket Client;
+        public static WebSocketSharp.WebSocket Client;
         public QueryParser Parser;
         public OnlineGame Game;
         public ChessPlayer Self;
@@ -69,6 +69,14 @@ namespace ChessClient
 
         void displayLoadError(APIException ex)
         {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action(() =>
+                {
+                    displayLoadError(ex);
+                }));
+                return;
+            }
             txtInput.Enabled = false;
             btnSend.Enabled = false;
             appendText("Error: ", FontStyle.Bold, Color.Red);
@@ -123,7 +131,7 @@ namespace ChessClient
             Send(new Packet(PacketId.ConnRequest, jobj));
         }
 
-        public void Send(Packet p)
+        public static void Send(Packet p)
         {
             Client.Send(p.ToString());
         }
@@ -178,7 +186,8 @@ namespace ChessClient
 
         private void Client_OnMessage(object sender, WebSocketSharp.MessageEventArgs e)
         {
-            var packet = JsonConvert.DeserializeObject<Packet>(e.Data);
+            var jobj = JObject.Parse(e.Data);
+            var packet = new Packet(jobj["id"].ToObject<PacketId>(), JObject.Parse(jobj["content"].ToString()));
             this.Invoke(new Action(() =>
             {
                 appendText("<< ", FontStyle.Regular, Color.Purple);
@@ -189,25 +198,60 @@ namespace ChessClient
 
         void handleMessage(Packet ping)
         {
+            this.Game = new OnlineGame();
             if(ping.Id == PacketId.GameStatus)
             {
-                Game = ping.Content.ToObject<OnlineGame>();
-                if(GameForm == null)
-                {
-                    GameForm = new GameForm(this);
-                    GameForm.Game = Game;
-                    GameForm.Show();
-                }
+                Game.FromJson(ping.Content);
+                GameForm?.UpdateUI();
             } else if (ping.Id == PacketId.MoveMade)
             {
                 GameForm.AuthorativeMove(ping);
             } else if (ping.Id == PacketId.PlayerIdent)
             {
-                var player = ping.Content["pl"].ToObject<ChessPlayer>();
+                var player = new ChessPlayer();
                 var id = ping.Content["id"].ToObject<int>();
-                Players[id] = player;
+                var content = ping.Content["player"].ToString();
+                if (content != "null")
+                {
+                    player.FromJson(JObject.Parse(content));
+                    Players[id] = player;
+                } else
+                {
+                    Players[id] = null;
+                }
                 getPlayerEvent.Set();
+            } else if (ping.Id == PacketId.ConnectionMade)
+            {
+                var player = new ChessPlayer();
+                player.FromJson(JObject.Parse(ping.Content["player"].ToString()));
+                if (player.Id == Self.Id)
+                    Self = player;
+                else
+                    Players[player.Id] = player;
+                string msg = "";
+                if(player.Side == PlayerSide.None)
+                {
+                    msg = "spectating";
+                }
+                else
+                {
+                    msg = player.Side.ToString();
+                    if(player.Side == PlayerSide.White)
+                    {
+                        this.Game.White = player;
+                    } else
+                    {
+                        this.Game.Black = player;
+                    }
+                }
+                appendChat($"{player.Name} has joined! They are {msg}!");
             }
+            if(GameForm == null)
+            {
+                GameForm = new GameForm(this);
+                GameForm.Show();
+            }
+            GameForm.UpdateUI();
         }
 
         private void button1_Click(object sender, EventArgs e)
