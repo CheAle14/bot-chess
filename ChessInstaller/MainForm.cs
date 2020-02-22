@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -47,16 +48,25 @@ namespace ChessInstaller
             return true;
         }
 
-        void continueRegistry()
+        void extractFiles()
         {
             if(this.InvokeRequired)
             {
                 this.Invoke(new Action(() =>
                 {
-                    continueRegistry();
+                    extractFiles();
                 }));
                 return;
             }
+            setUpdate("Extracting files...");
+            ZipFile.ExtractToDirectory(downloadPath, txtLocation.Text);
+            setUpdate("Extracted");
+            continueRegistry();
+        }
+
+        void continueRegistry()
+        {
+            var path = Path.Combine(txtLocation.Text, "ChessClient.exe");
             setUpdate("Registering web protocol");
             var main = Registry.CurrentUser.CreateSubKey("Software");
             var cls = main.CreateSubKey("Classes");
@@ -66,11 +76,11 @@ namespace ChessInstaller
             var keyShell = key.CreateSubKey("shell");
             var keyOpen = keyShell.CreateSubKey("open");
             var keyCom = keyOpen.CreateSubKey("command");
-            keyCom.SetValue("", $"\"{localPath}\" \"%1\" \"%2\" \"%3\" \"%4\" \"%5\" \"%6\" \"%7\" \"%8\" \"%9\"");
+            keyCom.SetValue("", $"\"{path}\" \"%1\" \"%2\" \"%3\" \"%4\" \"%5\" \"%6\" \"%7\" \"%8\" \"%9\"");
             setUpdate("Creating empty registry");
             var empty = Registry.CurrentUser.CreateSubKey("CheAle14");
             var chess = empty.CreateSubKey("ChessClient");
-            chess.SetValue("", localPath);
+            chess.SetValue("", path);
             chess.SetValue("InstalledOn", DateTime.Now.ToString());
             setUpdate("Complete!");
         }
@@ -82,7 +92,7 @@ namespace ChessInstaller
             var browser = new FolderBrowserDialog();
             browser.Description = "Select install folder";
             browser.ShowNewFolderButton = true;
-            browser.SelectedPath = @"C:\Program Files (x86)\";
+            //browser.SelectedPath = @"C:\Program Files (x86)\";
             var r = browser.ShowDialog();
             if(r == DialogResult.OK)
             {
@@ -113,8 +123,7 @@ namespace ChessInstaller
             var installPath = (string)chess.GetValue("");
             if(!string.IsNullOrWhiteSpace(installPath))
             {
-                localPath = installPath.Replace(Path.GetFileName(installPath), "");
-                txtLocation.Text = localPath;
+                txtLocation.Text = installPath.Replace(Path.GetFileName(installPath), "");
                 btnBrowse.Enabled = false;
                 btnInstall.Text = "Uninstall";
                 btnInstall.Enabled = true;
@@ -153,8 +162,8 @@ namespace ChessInstaller
         }
 
         public WebClient Downloader;
-        string url = "https://github.com/CheAle14/bot-chess/releases/download/v0.2/ChessClient.exe";
-        string localPath = "";
+        string url = "https://github.com/CheAle14/bot-chess/releases/latest/download/Chess.zip";
+        string downloadPath = "";
         long lastKnown;
 
         private void btnInstall_Click(object sender, EventArgs e)
@@ -176,7 +185,7 @@ namespace ChessInstaller
         {
             try
             {
-                Directory.Delete(localPath, true);
+                Directory.Delete(txtLocation.Text, true);
             }
             catch { }
             var k = Registry.CurrentUser.OpenSubKey("Software").OpenSubKey("Classes", true);
@@ -195,9 +204,9 @@ namespace ChessInstaller
             Downloader = new WebClient();
             Downloader.DownloadProgressChanged += Downloader_DownloadProgressChanged;
             Downloader.DownloadFileCompleted += Downloader_DownloadFileCompleted;
-            localPath = Path.Combine(txtLocation.Text, "ChessInstaller.exe");
+            downloadPath = Path.Combine(Path.GetTempPath(), "Chess.zip");
             Downloader.DownloadFileAsync(new Uri(url),
-                localPath);
+                downloadPath);
         }
 
         private void Downloader_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
@@ -212,7 +221,7 @@ namespace ChessInstaller
             {
                 setPercentage(100, formatBytes(lastKnown));
                 setUpdate("Download complee");
-                continueRegistry();
+                extractFiles();
             }
         }
 
