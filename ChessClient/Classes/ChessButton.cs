@@ -311,13 +311,18 @@ namespace ChessClient.Classes
             if(pins.HasFlag(Pin.Horizontal) || pins.HasFlag(Pin.LeftDiagonal) || pins.HasFlag(Pin.RightDiagonal)) 
                 return; // cant move at all
             var forward = this.GetForward(PieceHere.Owner);
-            forward?.SetCanMove(PieceHere, highlight);
-            if(!PieceHere.HasMoved)
+            if (forward.PieceHere == null)
+                forward?.SetCanMove(PieceHere, highlight);
+            if (!PieceHere.HasMoved)
             {
-                forward?.GetForward(PieceHere.Owner)?.SetCanMove(PieceHere,highlight);
+                var twice = forward?.GetForward(PieceHere.Owner);
+                if (twice?.PieceHere == null)
+                {
+                    twice?.SetCanMove(PieceHere, highlight);
+                }
             }
             // can move forward, but now we must verify vertical pins since we're aboutt to move off the file:
-            if(pins.HasFlag(Pin.Vertical))
+            if (pins.HasFlag(Pin.Vertical))
                 return;
             var left = forward?.GetLeft(PieceHere.Owner);
             var right = forward?.GetRight(PieceHere.Owner);

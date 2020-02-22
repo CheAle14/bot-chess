@@ -25,9 +25,17 @@ namespace ChessClient
         {
             lblWhite.Text = Main.Game.White?.Name ?? "Waiting for White";
             lblBlack.Text = Main.Game.Black?.Name ?? "Waiting for Black";
+            if(Main.Self == null)
+            {
+                this.Text = "Your account is unknown";
+            } else
+            {
+                this.Text = $"You are {(Main.Self.Side == PlayerSide.None ? "spectating" : Main.Self.Side.ToString())}";
+            }
             var wait = Main.Game?.Waiting ?? PlayerSide.None;
             lblWhite.ForeColor = wait == PlayerSide.White ? Color.Red : Color.FromKnownColor(KnownColor.ControlText);
             lblBlack.ForeColor = wait == PlayerSide.Black ? Color.Red : Color.FromKnownColor(KnownColor.ControlText);
+            Main.AdminForm?.UpdateUI();
         }
 
         public StartForm Main;
@@ -67,6 +75,8 @@ namespace ChessClient
                 {
                     if (btn.PieceHere == null)
                         return;
+                    if (btn.PieceHere?.Owner != Main.Self.Side)
+                        return; // cant move opponent's pieces
                     firstClick = btn;
                     firstClick.Evaluate(true);
                 }
@@ -103,6 +113,8 @@ namespace ChessClient
             toBtn.PieceHere = fromBtn.PieceHere;
             if (fromBtn.PieceHere != null)
                 fromBtn.PieceHere.Location = toBtn;
+            fromBtn.PieceHere = null;
+            toBtn.PieceHere.HasMoved = true;
             Main.Game.Waiting = (PlayerSide)((int)Main.Game.Waiting ^ 0b11);
             Board.Evaluate();
         }

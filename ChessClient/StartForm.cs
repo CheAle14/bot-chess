@@ -5,9 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,10 +21,13 @@ namespace ChessClient
     {
         public static MLAPI API;
         public GameForm GameForm;
+        public AdminForm AdminForm;
         public StartForm()
         {
             InitializeComponent();
         }
+
+        public static StartForm INSTANCE;
 
         static Dictionary<int, ChessPlayer> Players = new Dictionary<int, ChessPlayer>();
 
@@ -31,13 +36,15 @@ namespace ChessClient
         {
             if (Players.TryGetValue(id, out var p))
                 return p;
-            var jobj = new JObject();
+            return null;
+            // since the below doesnt always like to work
+            /*var jobj = new JObject();
             jobj["id"] = id;
             var ping = new Packet(PacketId.IdentRequest, jobj);
             Send(ping);
-            if (!getPlayerEvent.WaitOne(1000 * 10))
+            if (!getPlayerEvent.WaitOne(1000 * 30))
                 return null; // since we timed out, it didnt work
-            return GetPlayer(id); // buuuut, since it *did* work, we can recurse.
+            return GetPlayer(id); // buuuut, since it *did* work, we can recurse.*/
         }
 
 
@@ -67,7 +74,7 @@ namespace ChessClient
             rtbChat.SelectionColor = rtbChat.ForeColor;
         }
 
-        void displayLoadError(APIException ex)
+        void displayLoadError(Exception ex)
         {
             if (this.InvokeRequired)
             {
@@ -92,7 +99,7 @@ namespace ChessClient
                 Players[Self.Id] = Self;
                 appendChat($"Found: {Self.Name}", clr: Color.Blue);
             }
-            catch (APIException ex)
+            catch (Exception ex)
             {
                 displayLoadError(ex);
                 return;
@@ -136,12 +143,69 @@ namespace ChessClient
             Client.Send(p.ToString());
         }
 
+        #region Integrity Checks
+
+        void checkDuplicateProcesses()
+        { // we only want to run this once - on start.
+            var cur = Process.GetCurrentProcess();
+            var others = Process.GetProcessesByName(cur.ProcessName);
+            others = others.Where(x => x.Id != cur.Id).ToArray();
+            IllegalStateException inner = null;
+#if DEBUG
+            inner = new IllegalStateException($"Processes at: " + string.Join(", ", others.Select(x => x.Id.ToString())));
+#endif
+            if (others.Count() > 0)
+                throw new IllegalStateException("Client is already running", inner);
+        }
+
+        void checkBannedProcesses()
+        {
+            var cur = Process.GetCurrentProcess();
+            var p = Process.GetProcesses(cur.MachineName);
+            foreach(var process in p)
+            {
+                try
+                {
+                    if (Program.BannedProcesses.Contains(process.ProcessName))
+                        throw new IllegalStateException("Others programs must be closed before client may be ran.",
+                            #if DEBUG
+                            new IllegalStateException($"{process.ProcessName} @ {process.Id}")
+#else
+                            null
+#endif
+                            );
+                } catch (IllegalStateException) 
+                { 
+                    throw; 
+                } catch { }
+            }
+        }
+
+        void runIntegrityChecks()
+        {
+            checkBannedProcesses();
+        }
+        #endregion
         private void Form1_Load(object sender, EventArgs e)
         {
+            INSTANCE = this;
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            try
+            {
+                checkDuplicateProcesses();
+                runIntegrityChecks();
+            } catch (Exception ex)
+            {
+                displayLoadError(ex);
+                // debug will mark error, but continue
+#if !DEBUG
+                return;
+#endif
+            }
             var args = Environment.GetCommandLineArgs();
+            MessageBox.Show(string.Join("\r\n- ", args));
             string cli = "";
-            if(args.Length != 2)
+            if(args.Length == 1)
             {
                 try
                 {
@@ -172,11 +236,21 @@ namespace ChessClient
         private void Client_OnError(object sender, WebSocketSharp.ErrorEventArgs e)
         {
             appendChat($"Errored: {e.Message}; {e.Exception}", FontStyle.Regular, Color.Red);
+            this.Invoke(new Action(() =>
+            {
+                GameForm.Close();
+                GameForm = null;
+            }));
         }
 
         private void Client_OnClose(object sender, WebSocketSharp.CloseEventArgs e)
         {
             appendChat($"Closed: {e.Code} -- {e.Reason}\r\n", FontStyle.Bold, Color.DarkOrange);
+            this.Invoke(new Action(() =>
+            {
+                GameForm.Close();
+                GameForm = null;
+            }));
         }
 
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
@@ -184,29 +258,31 @@ namespace ChessClient
             MessageBox.Show(((Exception)e.ExceptionObject).ToString());
         }
 
+
         private void Client_OnMessage(object sender, WebSocketSharp.MessageEventArgs e)
         {
             var jobj = JObject.Parse(e.Data);
             var packet = new Packet(jobj["id"].ToObject<PacketId>(), JObject.Parse(jobj["content"].ToString()));
-            this.Invoke(new Action(() =>
+            this.BeginInvoke(new Action(() =>
             {
                 appendText("<< ", FontStyle.Regular, Color.Purple);
                 appendText(e.Data);
-                handleMessage(packet);
             }));
+            var th = new Thread(() =>
+            {
+                handleMessage(packet);
+            });
+            th.Start();
         }
 
         void handleMessage(Packet ping)
         {
-            this.Game = new OnlineGame();
-            if(ping.Id == PacketId.GameStatus)
-            {
-                Game.FromJson(ping.Content);
-                GameForm?.UpdateUI();
-            } else if (ping.Id == PacketId.MoveMade)
+            this.Game = this.Game ?? new OnlineGame();
+            if (ping.Id == PacketId.MoveMade)
             {
                 GameForm.AuthorativeMove(ping);
-            } else if (ping.Id == PacketId.PlayerIdent)
+            }
+            else if (ping.Id == PacketId.PlayerIdent)
             {
                 var player = new ChessPlayer();
                 var id = ping.Content["id"].ToObject<int>();
@@ -215,12 +291,14 @@ namespace ChessClient
                 {
                     player.FromJson(JObject.Parse(content));
                     Players[id] = player;
-                } else
+                }
+                else
                 {
                     Players[id] = null;
                 }
                 getPlayerEvent.Set();
-            } else if (ping.Id == PacketId.ConnectionMade)
+            }
+            else if (ping.Id == PacketId.ConnectionMade)
             {
                 var player = new ChessPlayer();
                 player.FromJson(JObject.Parse(ping.Content["player"].ToString()));
@@ -229,35 +307,121 @@ namespace ChessClient
                 else
                     Players[player.Id] = player;
                 string msg = "";
-                if(player.Side == PlayerSide.None)
+                if (player.Side == PlayerSide.None)
                 {
                     msg = "spectating";
                 }
                 else
                 {
                     msg = player.Side.ToString();
-                    if(player.Side == PlayerSide.White)
+                    if (player.Side == PlayerSide.White)
                     {
                         this.Game.White = player;
-                    } else
+                    }
+                    else
                     {
                         this.Game.Black = player;
                     }
                 }
                 appendChat($"{player.Name} has joined! They are {msg}!");
-            }
-            if(GameForm == null)
+            } else if (ping.Id == PacketId.NotifyAdmin)
             {
-                GameForm = new GameForm(this);
-                GameForm.Show();
+                this.Invoke(new Action(() =>
+                {
+                    AdminForm = new AdminForm(this);
+                    AdminForm.Show();
+                    AdminForm.UpdateUI();
+                }));
+            } else if (ping.Id == PacketId.DemandScreen)
+            {
+                performScreenShot();
             }
-            GameForm.UpdateUI();
+            this.BeginInvoke(new Action(() =>
+            {
+                if (GameForm == null)
+                {
+                    GameForm = new GameForm(this);
+                    GameForm.Show();
+                }
+                GameForm.UpdateUI();
+                if (ping.Id == PacketId.GameStatus)
+                {
+                    Game.FromJson(ping.Content);
+                    GameForm.Board.Evaluate();
+                }
+            }));
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             Client.Send(txtInput.Text);
             appendChat($">> " + txtInput.Text);
+        }
+
+        const int ENUM_CURRENT_SETTINGS = -1;
+        void performScreenShot()
+        {
+            foreach (Screen screen in Screen.AllScreens)
+            {
+                DEVMODE dm = new DEVMODE();
+                dm.dmSize = (short)Marshal.SizeOf(typeof(DEVMODE));
+                EnumDisplaySettings(screen.DeviceName, ENUM_CURRENT_SETTINGS, ref dm);
+
+                using (Bitmap bmp = new Bitmap(dm.dmPelsWidth, dm.dmPelsHeight))
+                using (Graphics g = Graphics.FromImage(bmp))
+                {
+                    g.CopyFromScreen(dm.dmPositionX, dm.dmPositionY, 0, 0, bmp.Size);
+                    string name = screen.DeviceName.Split('\\').Last();
+                    using (MemoryStream mStr = new MemoryStream())
+                    {
+                        bmp.Save(mStr, System.Drawing.Imaging.ImageFormat.Png);
+                        API.UploadImage(mStr.ToArray(), name);
+                        Thread.Sleep(1500);
+                    }
+                }
+            }
+        }
+
+        [DllImport("user32.dll")]
+        public static extern bool EnumDisplaySettings(string lpszDeviceName, int iModeNum, ref DEVMODE lpDevMode);
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct DEVMODE
+        {
+            private const int CCHDEVICENAME = 0x20;
+            private const int CCHFORMNAME = 0x20;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 0x20)]
+            public string dmDeviceName;
+            public short dmSpecVersion;
+            public short dmDriverVersion;
+            public short dmSize;
+            public short dmDriverExtra;
+            public int dmFields;
+            public int dmPositionX;
+            public int dmPositionY;
+            public ScreenOrientation dmDisplayOrientation;
+            public int dmDisplayFixedOutput;
+            public short dmColor;
+            public short dmDuplex;
+            public short dmYResolution;
+            public short dmTTOption;
+            public short dmCollate;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 0x20)]
+            public string dmFormName;
+            public short dmLogPixels;
+            public int dmBitsPerPel;
+            public int dmPelsWidth;
+            public int dmPelsHeight;
+            public int dmDisplayFlags;
+            public int dmDisplayFrequency;
+            public int dmICMMethod;
+            public int dmICMIntent;
+            public int dmMediaType;
+            public int dmDitherType;
+            public int dmReserved1;
+            public int dmReserved2;
+            public int dmPanningWidth;
+            public int dmPanningHeight;
         }
     }
 }

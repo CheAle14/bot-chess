@@ -22,6 +22,27 @@ namespace ChessClient.Classes
             if (bId != 0)
                 Black = StartForm.GetPlayer(bId);
             Waiting = json["wait"].ToObject<PlayerSide>();
+            if(json.ContainsKey("board"))
+            {
+                var board = json["board"];
+                var BOARD = StartForm.INSTANCE.GameForm.Board;
+                foreach(var side in new PlayerSide[] { PlayerSide.White, PlayerSide.Black })
+                {
+                    var content = board[side.ToString()];
+                    var PIECES = BOARD.Pieces[side];
+                    foreach(JProperty pieceMoved in content.Children())
+                    {
+                        var id = int.Parse(pieceMoved.Name.Substring("P#".Length));
+                        var piece = PIECES.FirstOrDefault(x => x.Id == id);
+                        if(piece.Location != null)
+                        {
+                            piece.Location.PieceHere = null;
+                        }
+                        piece.Location = BOARD.GetButtonAt(pieceMoved.ToObject<string>());
+                        piece.Location.PieceHere = piece;
+                    }
+                }
+            }
         }
 
         public override JObject ToJson()

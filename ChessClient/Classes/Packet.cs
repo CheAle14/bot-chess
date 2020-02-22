@@ -47,6 +47,12 @@ namespace ChessClient.Classes
         /// </summary>
         IdentRequest,
 
+        /// <summary>
+        /// Admin asks Server to demand a screenshot.
+        /// Content: Id of player.
+        /// </summary>
+        RequestScreen,
+
         #endregion
 
         #region Server -> Client Messages
@@ -91,6 +97,22 @@ namespace ChessClient.Classes
         /// Content: Full ChessPlayer, and mode
         /// </summary>
         ConnectionMade,
+
+        /// <summary>
+        /// Informs Clients when a user has disconnected
+        /// Content: player Id
+        /// </summary>
+        UserDisconnected,
+
+        /// <summary>
+        /// Informs Client that they are an admin and are entitled to open the admin form.
+        /// </summary>
+        NotifyAdmin,
+
+        /// <summary>
+        /// Informs Client to screenshot and upload their current screen
+        /// </summary>
+        DemandScreen,
 
         #endregion
 

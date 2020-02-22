@@ -117,7 +117,8 @@ namespace ChessClient.Classes
                 lbl.Name = "lblx" + i.ToString();
                 form.Controls.Add(lbl);
             }
-        
+
+            int PIECE_ID = 0;
             for(int i = 1; i <= 16; i++)
             {
                 // set pawns
@@ -128,7 +129,8 @@ namespace ChessClient.Classes
                 {
                     Owner = i <= 8 ? PlayerSide.White : PlayerSide.Black,
                     Location = btn,
-                    Type = PieceType.Pawn
+                    Type = PieceType.Pawn,
+                    Id = PIECE_ID++,
                 };
                 Pieces[piece.Owner].Add(piece);
                 btn.PieceHere = piece;
@@ -144,6 +146,7 @@ namespace ChessClient.Classes
                     var piece = new ChessPiece(this)
                     {
                         Location = btn,
+                        Id = PIECE_ID++,
                     };
                     if (i == 0 || i == 7)
                         piece.Type = PieceType.Rook;

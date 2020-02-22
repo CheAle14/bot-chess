@@ -13,6 +13,7 @@ namespace ChessClient.Classes
         {
             Board = b;
         }
+        public int Id { get; set; }
         GameBoard Board;
         public PlayerSide Owner { get; set; }
         public PlayerSide Opponent => (PlayerSide)((int)Owner ^ 0b11);

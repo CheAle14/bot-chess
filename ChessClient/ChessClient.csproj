@@ -52,6 +52,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdminForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AdminForm.Designer.cs">
+      <DependentUpon>AdminForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Classes\APIException.cs" />
     <Compile Include="Classes\APIObject.cs" />
     <Compile Include="Classes\ChessButton.cs">
@@ -60,6 +66,7 @@
     <Compile Include="Classes\ChessPiece.cs" />
     <Compile Include="Classes\ChessPlayer.cs" />
     <Compile Include="Classes\GameBoard.cs" />
+    <Compile Include="Classes\IllegalStateException.cs" />
     <Compile Include="Classes\MLAPI.cs" />
     <Compile Include="Classes\OnlineGame.cs" />
     <Compile Include="Classes\Packet.cs" />
@@ -82,6 +89,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="AdminForm.resx">
+      <DependentUpon>AdminForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="GameForm.resx">
       <DependentUpon>GameForm.cs</DependentUpon>
     </EmbeddedResource>
