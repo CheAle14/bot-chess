@@ -116,13 +116,24 @@ namespace ChessClient.Classes
             if (PieceHere == null)
                 return; // nothing to do as nothing can move
             if (PieceHere.Type == PieceType.Pawn)
+            {
                 evalPawn(highlight);
+                return;
+            }
+            if(PieceHere.Type == PieceType.Knight)
+            {
+                evalHorse(highlight);
+                return;
+            }
+            if(PieceHere.Type == PieceType.King)
+            {
+                evalKing(highlight);
+                return;
+            }
             if (PieceHere.Type == PieceType.Rook || PieceHere.Type == PieceType.Queen)
                 evalVerticals(highlight);
             if (PieceHere.Type == PieceType.Bishop || PieceHere.Type == PieceType.Queen)
                 evalDiagonals(highlight);
-            if (PieceHere.Type == PieceType.King)
-                evalKing(highlight);
         }
 
         public void SetCanMove(ChessPiece piece, bool highlight)
@@ -224,6 +235,25 @@ namespace ChessClient.Classes
                     if (amountInWay > 1)
                         break;
                 }
+            }
+        }
+
+        void evalHorse(bool highlight)
+        {
+            int[] topL = new int[] { -1, 2 };
+            int[] topR = new int[] { 1, 2 };
+            int[] rightU = new int[] { 2, 1 };
+            int[] rightD = new int[] { 2, -1 };
+            int[] bottomL = new int[] { -1, -2 };
+            int[] bottomR = new int[] { 1, -2 };
+            int[] leftU = new int[] { -2, 1 };
+            int[] leftD = new int[] { -2, -1 };
+            foreach(var direction in new List<int[]> { topL, topR, rightU, rightD, bottomL, bottomR, leftU, leftD})
+            {
+                var loc = GetRelative(PieceHere.Owner, direction[0], direction[1]);
+                if(loc == null)
+                    continue;
+                loc.SetCanMove(PieceHere, highlight);
             }
         }
 

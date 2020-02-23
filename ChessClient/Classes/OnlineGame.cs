@@ -38,8 +38,15 @@ namespace ChessClient.Classes
                         {
                             piece.Location.PieceHere = null;
                         }
-                        piece.Location = BOARD.GetButtonAt(pieceMoved.ToObject<string>());
-                        piece.Location.PieceHere = piece;
+                        var location = pieceMoved.ToObject<string>();
+                        if(location == "null")
+                        { // piece was taken
+                            piece.Location = null;
+                        } else
+                        {
+                            piece.Location = BOARD.GetButtonAt(location);
+                            piece.Location.PieceHere = piece;
+                        }
                     }
                 }
             }
