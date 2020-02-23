@@ -11,7 +11,11 @@ namespace ChessClient.Classes
 {
     public class MLAPI
     {
+#if DEBUG
         public const string URL = "http://localhost:8887/";
+#else
+        public const string URL = "https://ml-api.uk.ms/";
+#endif
         public string Token;
         HttpClient Client;
 
