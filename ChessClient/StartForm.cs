@@ -128,10 +128,14 @@ namespace ChessClient
 
             appendChat($"Joining game...", clr: Color.Blue);
 #if DEBUG
-            Client = new WebSocketSharp.WebSocket($"ws://localhost:4649/chess");
+            Client = new WebSocketSharp.WebSocket($"ws://localhost:4650/chess");
 #else
-            Client = new WebSocketSharp.WebSocket($"ws://ml-api.uk.ms:4649/chess");
+            Client = new WebSocketSharp.WebSocket($"ws://ml-api.uk.ms:4650/chess");
 #endif
+            Client.Log.Output = (x, y) =>
+            {
+                Console.WriteLine($"{x.Date} {x.Message} {y}");
+            };
             Client.OnMessage += Client_OnMessage;
             Client.OnClose += Client_OnClose;
             Client.OnError += Client_OnError;
