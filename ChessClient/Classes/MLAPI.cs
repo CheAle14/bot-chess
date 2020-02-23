@@ -11,11 +11,6 @@ namespace ChessClient.Classes
 {
     public class MLAPI
     {
-#if DEBUG
-        public const string URL = "http://localhost:8887/";
-#else
-        public const string URL = "https://ml-api.uk.ms/";
-#endif
         public string Token;
         HttpClient Client;
 
@@ -23,7 +18,11 @@ namespace ChessClient.Classes
         {
             Token = token;
             Client = new HttpClient();
-            Client.BaseAddress = new Uri(URL);
+#if DEBUG
+            Client.BaseAddress = new Uri($"http://localhost:8887/");
+#else
+            Client.BaseAddress = new Uri($"https://ml-api.uk.ms/");
+#endif
             Client.DefaultRequestHeaders.Add("User-Agent", "bot-chess");
             Client.DefaultRequestHeaders.Add("X-TOKEN", Token);
         }

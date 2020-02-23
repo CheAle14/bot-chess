@@ -127,7 +127,11 @@ namespace ChessClient
             }
 
             appendChat($"Joining game...", clr: Color.Blue);
-            Client = new WebSocketSharp.WebSocket("ws://localhost:4649/chess");
+#if DEBUG
+            Client = new WebSocketSharp.WebSocket($"ws://localhost:4649/chess");
+#else
+            Client = new WebSocketSharp.WebSocket($"ws://ml-api.uk.ms:4649/chess");
+#endif
             Client.OnMessage += Client_OnMessage;
             Client.OnClose += Client_OnClose;
             Client.OnError += Client_OnError;
@@ -219,8 +223,13 @@ namespace ChessClient
                     MessageBox.Show("Program must be started from website.");
                     try
                     {
-                        System.Diagnostics.Process.Start(MLAPI.URL + "chess/online"); 
-                    } catch { }
+#if DEBUG
+                        System.Diagnostics.Process.Start("http://localhost:8887/chess/online");
+#else
+                        System.Diagnostics.Process.Start("https://ml-api.uk.ms/chess/online");
+#endif
+                    }
+                    catch { }
                     this.Close();
                     return;
                 }
