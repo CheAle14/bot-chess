@@ -250,7 +250,7 @@ namespace ChessClient
             appendChat($"Errored: {e.Message}; {e.Exception}", FontStyle.Regular, Color.Red);
             this.Invoke(new Action(() =>
             {
-                GameForm.Close();
+                GameForm?.Close();
                 GameForm = null;
             }));
         }
@@ -260,7 +260,7 @@ namespace ChessClient
             appendChat($"Closed: {e.Code} -- {e.Reason}\r\n", FontStyle.Bold, Color.DarkOrange);
             this.Invoke(new Action(() =>
             {
-                GameForm.Close();
+                GameForm?.Close();
                 GameForm = null;
             }));
         }
