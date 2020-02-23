@@ -30,6 +30,21 @@ namespace ChessClient.Classes
             { PlayerSide.White, new List<ChessPiece>() }
         };
 
+        public ChessPiece GetPiece(int id)
+        {
+            foreach(var lst in Pieces.Values)
+            {
+                foreach(var item in lst)
+                {
+                    if (item.Id == id)
+                        return item;
+                }
+            }
+            return null;
+        }
+
+        public List<ChessPiece> CheckingKing { get; set; }
+
         public string GetReference(int x, int y) 
         {
             string t = "";
@@ -169,6 +184,7 @@ namespace ChessClient.Classes
 
         public void Evaluate()
         {
+            CheckingKing = new List<ChessPiece>();
             foreach(var x in board)
                 x.Reset();
             foreach (var btn in board)

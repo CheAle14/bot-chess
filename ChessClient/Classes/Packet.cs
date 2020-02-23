@@ -53,6 +53,13 @@ namespace ChessClient.Classes
         /// </summary>
         RequestScreen,
 
+        /// <summary>
+        /// Client requests the game be ended
+        /// Can be used by both players and admins.
+        /// Content: Id of winner
+        /// </summary>
+        RequestGameEnd,
+
         #endregion
 
         #region Server -> Client Messages
@@ -113,6 +120,12 @@ namespace ChessClient.Classes
         /// Informs Client to screenshot and upload their current screen
         /// </summary>
         DemandScreen,
+
+        /// <summary>
+        /// Informs Clients that the game has ended
+        /// Content: Id of winner.
+        /// </summary>
+        GameEnd,
 
         #endregion
 

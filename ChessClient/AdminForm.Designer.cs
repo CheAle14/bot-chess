@@ -34,6 +34,11 @@
             this.lblBlack = new System.Windows.Forms.Label();
             this.resetTimer = new System.Windows.Forms.Timer(this.components);
             this.btnScreenB = new System.Windows.Forms.Button();
+            this.btnWhiteWin = new System.Windows.Forms.Button();
+            this.btnBlackWin = new System.Windows.Forms.Button();
+            this.btnDraw = new System.Windows.Forms.Button();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnScreenshotW
@@ -79,17 +84,65 @@
             this.btnScreenB.UseVisualStyleBackColor = true;
             this.btnScreenB.Click += new System.EventHandler(this.btnScreenB_Click);
             // 
+            // btnWhiteWin
+            // 
+            this.btnWhiteWin.BackColor = System.Drawing.Color.IndianRed;
+            this.btnWhiteWin.Location = new System.Drawing.Point(6, 21);
+            this.btnWhiteWin.Name = "btnWhiteWin";
+            this.btnWhiteWin.Size = new System.Drawing.Size(219, 62);
+            this.btnWhiteWin.TabIndex = 4;
+            this.btnWhiteWin.Text = "Make White Win";
+            this.btnWhiteWin.UseVisualStyleBackColor = false;
+            this.btnWhiteWin.Click += new System.EventHandler(this.btnWhiteWin_Click);
+            // 
+            // btnBlackWin
+            // 
+            this.btnBlackWin.BackColor = System.Drawing.Color.IndianRed;
+            this.btnBlackWin.Location = new System.Drawing.Point(548, 21);
+            this.btnBlackWin.Name = "btnBlackWin";
+            this.btnBlackWin.Size = new System.Drawing.Size(219, 62);
+            this.btnBlackWin.TabIndex = 5;
+            this.btnBlackWin.Text = "Make Black Win";
+            this.btnBlackWin.UseVisualStyleBackColor = false;
+            this.btnBlackWin.Click += new System.EventHandler(this.btnBlackWin_Click);
+            // 
+            // btnDraw
+            // 
+            this.btnDraw.BackColor = System.Drawing.Color.IndianRed;
+            this.btnDraw.Location = new System.Drawing.Point(274, 21);
+            this.btnDraw.Name = "btnDraw";
+            this.btnDraw.Size = new System.Drawing.Size(219, 62);
+            this.btnDraw.TabIndex = 6;
+            this.btnDraw.Text = "Declare Draw";
+            this.btnDraw.UseVisualStyleBackColor = false;
+            this.btnDraw.Click += new System.EventHandler(this.btnDraw_Click);
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.BackColor = System.Drawing.SystemColors.Control;
+            this.groupBox1.Controls.Add(this.btnWhiteWin);
+            this.groupBox1.Controls.Add(this.btnBlackWin);
+            this.groupBox1.Controls.Add(this.btnDraw);
+            this.groupBox1.Location = new System.Drawing.Point(15, 161);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(773, 96);
+            this.groupBox1.TabIndex = 7;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "These buttons will end the game! Only do so when it should be! Do not abuse.";
+            // 
             // AdminForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(800, 275);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.btnScreenB);
             this.Controls.Add(this.lblBlack);
             this.Controls.Add(this.lblWhite);
             this.Controls.Add(this.btnScreenshotW);
             this.Name = "AdminForm";
             this.Text = "AdminForm";
+            this.groupBox1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -101,5 +154,9 @@
         private System.Windows.Forms.Label lblBlack;
         private System.Windows.Forms.Timer resetTimer;
         private System.Windows.Forms.Button btnScreenB;
+        private System.Windows.Forms.Button btnWhiteWin;
+        private System.Windows.Forms.Button btnBlackWin;
+        private System.Windows.Forms.Button btnDraw;
+        private System.Windows.Forms.GroupBox groupBox1;
     }
 }

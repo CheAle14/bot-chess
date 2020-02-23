@@ -52,7 +52,7 @@ namespace ChessClient
         }
 
         public ChessButton firstClick;
-        bool handlingMove = false;
+        public bool handlingMove = false;
         public void Btn_Click(object sender, EventArgs e)
         {
             if (sender is ChessButton btn)
@@ -86,12 +86,18 @@ namespace ChessClient
                     {
                         firstClick.Evaluate(false);
                     }
-                    else if (btn.BackColor == Color.FromKnownColor(KnownColor.Control) || btn.BackColor == Color.Gray)
+                    else if (btn.BackColor == Color.FromKnownColor(KnownColor.Control) || btn.BackColor == Color.Gray || btn.BackColor == Color.Purple)
                     {
                         firstClick.Evaluate(false);
                     }
                     else
                     {
+                        if(willKingStillCheck(firstClick, btn))
+                        {
+                            MessageBox.Show("Your King is in Check!\nYou must defend your king.");
+                            return;
+                        }
+                        handlingMove = true;
                         var jobj = new JObject();
                         jobj["from"] = firstClick.Name;
                         jobj["to"] = btn.Name;
@@ -100,6 +106,40 @@ namespace ChessClient
                     firstClick = null;
                 }
             }
+        }
+
+        bool willKingStillCheck(ChessButton from, ChessButton to)
+        {
+            if (Board.CheckingKing.Count == 0)
+                return false;
+            Dictionary<int, ChessButton> original = new Dictionary<int, ChessButton>();
+            original[from.PieceHere.Id] = from;
+            if (to.PieceHere != null)
+            {
+                original[to.PieceHere.Id] = to;
+                to.PieceHere.Location = null;
+            }
+            to.PieceHere = from.PieceHere;
+            from.PieceHere.Location = to;
+            var ourKing = Board.Pieces[Main.Self.Side].FirstOrDefault(x => x.Type == PieceType.King);
+            ourKing.Location.Reset();
+            foreach(var t in Board.CheckingKing)
+            {
+                t?.Location?.Evaluate(false);
+            }
+            foreach (var t in original.Values)
+                t.Evaluate(false);
+            var can = ourKing.Location.CanMoveHere.Count > 0;
+            from.PieceHere = null;
+            to.PieceHere = null;
+            foreach(var t in original)
+            {
+                var piece = Board.GetPiece(t.Key);
+                t.Value.PieceHere = piece;
+                piece.Location = t.Value;
+            }
+            Board.Evaluate();
+            return can;
         }
     
         public void AuthorativeMove(Packet ping)

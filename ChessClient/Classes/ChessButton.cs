@@ -136,6 +136,12 @@ namespace ChessClient.Classes
             {
                 if(piece.Owner != PieceHere.Owner)
                 {
+                    if(PieceHere.Type == PieceType.King)
+                    {
+                        if(!Board.CheckingKing.Contains(piece))
+                            Board.CheckingKing.Add(piece);
+                        piece.Location.BackColor = Color.Purple;
+                    }
                     if(highlight)
                         this.BackColor = Color.Red;
                 } else

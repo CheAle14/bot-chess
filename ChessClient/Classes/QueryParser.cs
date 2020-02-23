@@ -24,7 +24,6 @@ namespace ChessClient.Classes
 
         void parse()
         {
-            MessageBox.Show(Argument, "Parse");
             var strip = Argument.Substring("chess://".Length);
             var split = strip.Split('/');
             if(Enum.TryParse<StartMode>(split[0], true, out var mode))

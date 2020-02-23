@@ -32,6 +32,15 @@ namespace ChessClient
             lblBlack.ForeColor = wait == PlayerSide.Black ? Color.Red : Color.FromKnownColor(KnownColor.ControlText);
         }
 
+        void setItems(bool state)
+        {
+            btnScreenshotW.Enabled = state;
+            btnScreenB.Enabled = state;
+            btnBlackWin.Enabled = state;
+            btnDraw.Enabled = state;
+            btnWhiteWin.Enabled = state;
+        }
+
         void demandScreen(ChessPlayer player)
         {
             if (player == null)
@@ -43,25 +52,47 @@ namespace ChessClient
 
         private void btnScreenshot_Click(object sender, EventArgs e)
         {
-            btnScreenshotW.Enabled = false;
-            btnScreenB.Enabled = false;
+            setItems(false);
             demandScreen(Main.Game.White);
             resetTimer.Start();
         }
 
         private void resetTimer_Tick(object sender, EventArgs e)
         {
-            btnScreenB.Enabled = true;
-            btnScreenshotW.Enabled = true;
+            setItems(true);
             resetTimer.Stop();
         }
 
         private void btnScreenB_Click(object sender, EventArgs e)
         {
-            btnScreenshotW.Enabled = false;
-            btnScreenB.Enabled = false;
+            setItems(false);
             demandScreen(Main.Game.Black);
             resetTimer.Start();
+        }
+
+        void makeWin(ChessPlayer winner) 
+        {
+            setItems(false);
+            int id = winner?.Id ?? -1;
+            var jobj = new JObject();
+            jobj["id"] = id;
+            StartForm.Send(new Packet(PacketId.RequestGameEnd, jobj));
+            resetTimer.Start();
+        }
+
+        private void btnWhiteWin_Click(object sender, EventArgs e)
+        {
+            makeWin(Main.Game.White);
+        }
+
+        private void btnDraw_Click(object sender, EventArgs e)
+        {
+            makeWin(null);
+        }
+
+        private void btnBlackWin_Click(object sender, EventArgs e)
+        {
+            makeWin(Main.Game.Black);
         }
     }
 }

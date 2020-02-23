@@ -202,8 +202,11 @@ namespace ChessClient
                 return;
 #endif
             }
+#if !DEBUG
+            btnSend.Enabled = false;
+            txtInput.Enabled = false;
+#endif
             var args = Environment.GetCommandLineArgs();
-            MessageBox.Show(string.Join("\r\n- ", args));
             string cli = "";
             if(args.Length == 1)
             {
@@ -261,6 +264,8 @@ namespace ChessClient
 
         private void Client_OnMessage(object sender, WebSocketSharp.MessageEventArgs e)
         {
+            if(GameForm != null)
+                GameForm.handlingMove = false;
             var jobj = JObject.Parse(e.Data);
             var packet = new Packet(jobj["id"].ToObject<PacketId>(), JObject.Parse(jobj["content"].ToString()));
             this.BeginInvoke(new Action(() =>
@@ -335,6 +340,31 @@ namespace ChessClient
             } else if (ping.Id == PacketId.DemandScreen)
             {
                 performScreenShot();
+            } else if (ping.Id == PacketId.UserDisconnected)
+            {
+                var player = GetPlayer(ping.Content["id"].ToObject<int>());
+                if((player?.Side ?? PlayerSide.None) != PlayerSide.None)
+                {
+                    this.Invoke(new Action(() =>
+                    {
+                        GameForm.Hide();
+                    }));
+                }
+            } else if (ping.Id == PacketId.GameEnd)
+            {
+                this.Invoke(new Action(() =>
+                {
+                    GameForm.Hide();
+                }));
+                var player = GetPlayer(ping.Content["id"].ToObject<int>());
+                if(player == null)
+                {
+                    MessageBox.Show("Game is drawn!");
+                } else
+                {
+                    MessageBox.Show($"{player.Name} has won!");
+                }
+                this.Close();
             }
             this.BeginInvoke(new Action(() =>
             {
@@ -348,7 +378,10 @@ namespace ChessClient
                 {
                     Game.FromJson(ping.Content);
                     GameForm.Board.Evaluate();
+                    GameForm.UpdateUI();
                 }
+                if (GameForm.Visible == false)
+                    GameForm.Show();
             }));
         }
 
