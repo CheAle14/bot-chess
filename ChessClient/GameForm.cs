@@ -83,7 +83,7 @@ namespace ChessClient
             blockPanel.Controls.Add(blockLbl);
             setBlock(null);
             chromeTimer = new System.Windows.Forms.Timer();
-            chromeTimer.Interval = 2000;
+            chromeTimer.Interval = 5000;
             chromeTimer.Tick += ChromeTimer_Tick;
             chromeTimer.Start();
 
@@ -163,6 +163,8 @@ namespace ChessClient
             return false;
         }
 
+        TimeQueue times = new TimeQueue(10);
+
         bool hasTriggered = false;
         void performAntiCheatChecks()
         {
@@ -184,6 +186,9 @@ namespace ChessClient
                 setBlock(null);
                 hasTriggered = false;
                 blockedProcesses = new List<int>();
+            } catch (System.Windows.Automation.ElementNotAvailableException)
+            {
+                Console.WriteLine("Element not available.");
             }
             catch
             {
@@ -192,6 +197,7 @@ namespace ChessClient
             {
                 watch.Stop();
                 Console.WriteLine($"Checks took {watch.ElapsedMilliseconds}");
+                times.Add(watch.ElapsedMilliseconds);
             }
         }
 
@@ -199,6 +205,13 @@ namespace ChessClient
         {
             var th = new Thread(performAntiCheatChecks);
             th.Start();
+            if(times.Items % 2 == 0)
+            {
+                chromeTimer.Interval = Math.Max(1500, (int)(times.GetAverage() * 1.2));
+                Console.WriteLine("Interval now: " + chromeTimer.Interval);
+                if (times.Items > 30)
+                    times.Items = 10; // prevent integer overflows. (technically.. shouldnt be massively likely)
+            }
         }
 
         private void GameForm_MouseDoubleClick(object sender, MouseEventArgs e)
