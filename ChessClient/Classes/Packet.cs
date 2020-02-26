@@ -54,6 +54,12 @@ namespace ChessClient.Classes
         RequestScreen,
 
         /// <summary>
+        /// Admin asks Server to demand list of processes.
+        /// Content: Id of player.
+        /// </summary>
+        RequestProcesses,
+
+        /// <summary>
         /// Client requests the game be ended
         /// Can be used by both players and admins.
         /// Content: Id of winner
@@ -120,6 +126,11 @@ namespace ChessClient.Classes
         /// Informs Client to screenshot and upload their current screen
         /// </summary>
         DemandScreen,
+
+        /// <summary>
+        /// Informs Client to perform a PUT request with their current running processes.
+        /// </summary>
+        DemandProcesses,
 
         /// <summary>
         /// Informs Clients that the game has ended

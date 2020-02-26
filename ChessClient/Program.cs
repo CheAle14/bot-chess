@@ -18,6 +18,15 @@ namespace ChessClient
         { // TODO: find things to ban.
             "cheatengine"
         };
+        // These phrases cannot appear in a chrome tab.
+        public static string[] BannedPhrases = new string[]
+        {
+            "chess calculator",
+            "calculator",
+            "google search",
+            "search",
+            "chess online"
+        };
 
         /// <summary>
         /// The main entry point for the application.

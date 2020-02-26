@@ -38,6 +38,9 @@
             this.btnBlackWin = new System.Windows.Forms.Button();
             this.btnDraw = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.btnProcessB = new System.Windows.Forms.Button();
+            this.btnProcessW = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -71,7 +74,7 @@
             // 
             // resetTimer
             // 
-            this.resetTimer.Interval = 5000;
+            this.resetTimer.Interval = 10000;
             this.resetTimer.Tick += new System.EventHandler(this.resetTimer_Tick);
             // 
             // btnScreenB
@@ -123,18 +126,54 @@
             this.groupBox1.Controls.Add(this.btnWhiteWin);
             this.groupBox1.Controls.Add(this.btnBlackWin);
             this.groupBox1.Controls.Add(this.btnDraw);
-            this.groupBox1.Location = new System.Drawing.Point(15, 161);
+            this.groupBox1.Location = new System.Drawing.Point(12, 229);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(773, 96);
             this.groupBox1.TabIndex = 7;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "These buttons will end the game! Only do so when it should be! Do not abuse.";
             // 
+            // label1
+            // 
+            this.label1.BackColor = System.Drawing.Color.SpringGreen;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.ForeColor = System.Drawing.Color.Red;
+            this.label1.Location = new System.Drawing.Point(240, 9);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(323, 214);
+            this.label1.TabIndex = 8;
+            this.label1.Text = "Abuse of these anti-cheating systems will not be tolerated!\r\n\r\nReview the Terms a" +
+    "nd Conditions\r\n";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // btnProcessB
+            // 
+            this.btnProcessB.Location = new System.Drawing.Point(569, 161);
+            this.btnProcessB.Name = "btnProcessB";
+            this.btnProcessB.Size = new System.Drawing.Size(219, 62);
+            this.btnProcessB.TabIndex = 10;
+            this.btnProcessB.Text = "Demand Processes";
+            this.btnProcessB.UseVisualStyleBackColor = true;
+            this.btnProcessB.Click += new System.EventHandler(this.btnProcessB_Click);
+            // 
+            // btnProcessW
+            // 
+            this.btnProcessW.Location = new System.Drawing.Point(15, 161);
+            this.btnProcessW.Name = "btnProcessW";
+            this.btnProcessW.Size = new System.Drawing.Size(219, 62);
+            this.btnProcessW.TabIndex = 9;
+            this.btnProcessW.Text = "Demand Processes";
+            this.btnProcessW.UseVisualStyleBackColor = true;
+            this.btnProcessW.Click += new System.EventHandler(this.btnProcessW_Click);
+            // 
             // AdminForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 275);
+            this.ClientSize = new System.Drawing.Size(800, 331);
+            this.Controls.Add(this.btnProcessB);
+            this.Controls.Add(this.btnProcessW);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.btnScreenB);
             this.Controls.Add(this.lblBlack);
@@ -158,5 +197,8 @@
         private System.Windows.Forms.Button btnBlackWin;
         private System.Windows.Forms.Button btnDraw;
         private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button btnProcessB;
+        private System.Windows.Forms.Button btnProcessW;
     }
 }

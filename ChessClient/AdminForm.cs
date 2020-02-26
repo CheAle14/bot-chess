@@ -23,6 +23,18 @@ namespace ChessClient
             InitializeComponent();
         }
 
+        List<TControl> getControlsOfType<TControl>(Control parent) where TControl : Control
+        {
+            List<TControl> ls = new List<TControl>();
+            foreach (Control c in parent.Controls)
+            {
+                if (c is TControl tc)
+                    ls.Add(tc);
+                ls.AddRange(getControlsOfType<TControl>(c));
+            }
+            return ls;
+        }
+
         public void UpdateUI()
         {
             lblWhite.Text = Main.Game.White?.Name ?? "Waiting for White";
@@ -34,11 +46,9 @@ namespace ChessClient
 
         void setItems(bool state)
         {
-            btnScreenshotW.Enabled = state;
-            btnScreenB.Enabled = state;
-            btnBlackWin.Enabled = state;
-            btnDraw.Enabled = state;
-            btnWhiteWin.Enabled = state;
+            var btns = getControlsOfType<Button>(this);
+            foreach (var btn in btns)
+                btn.Enabled = state;
         }
 
         void demandScreen(ChessPlayer player)
@@ -93,6 +103,25 @@ namespace ChessClient
         private void btnBlackWin_Click(object sender, EventArgs e)
         {
             makeWin(Main.Game.Black);
+        }
+
+        void demandProcesses(ChessPlayer player)
+        {
+            setItems(false);
+            var jobj = new JObject();
+            jobj["id"] = player.Id;
+            StartForm.Send(new Packet(PacketId.RequestProcesses, jobj));
+            resetTimer.Start();
+        }
+
+        private void btnProcessW_Click(object sender, EventArgs e)
+        {
+            demandProcesses(Main.Game.White);
+        }
+
+        private void btnProcessB_Click(object sender, EventArgs e)
+        {
+            demandProcesses(Main.Game.Black);
         }
     }
 }

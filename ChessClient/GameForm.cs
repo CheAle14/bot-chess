@@ -4,10 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Automation;
 using System.Windows.Forms;
 
 namespace ChessClient
@@ -41,9 +44,161 @@ namespace ChessClient
         public StartForm Main;
         public GameBoard Board;
 
+        System.Windows.Forms.Timer chromeTimer;
+        Panel blockPanel;
+        Label blockLbl;
+
+        void setBlock(string text)
+        {
+            if(this.InvokeRequired)
+            {
+                this.Invoke(new Action(() =>
+                {
+                    setBlock(text);
+                }));
+                return;
+            }
+            blockLbl.Text = $"Game has been halted.\r\n{text ?? ""}";
+            hasTriggered = !string.IsNullOrWhiteSpace(text);
+            blockPanel.Visible = hasTriggered; 
+        }
+
         private void GameForm_Load(object sender, EventArgs e)
         {
             Board = new GameBoard(this);
+            blockPanel = new Panel();
+            blockPanel.Name = "block";
+            blockPanel.Location = new Point(0, 0);
+            blockPanel.Dock = DockStyle.Fill;
+            Controls.Add(blockPanel);
+            blockPanel.BringToFront();
+            blockLbl = new Label();
+            blockLbl.Name = "blockLbl";
+            blockLbl.Text = "Game has been halted.\r\n";
+            blockLbl.Location = new Point(0, 0);
+            blockLbl.Dock = DockStyle.Fill;
+            blockLbl.Font = new Font(FontFamily.GenericSerif, 12, FontStyle.Bold);
+            blockLbl.ForeColor = Color.Red;
+            blockLbl.TextAlign = ContentAlignment.MiddleCenter;
+            blockPanel.Controls.Add(blockLbl);
+            setBlock(null);
+            chromeTimer = new System.Windows.Forms.Timer();
+            chromeTimer.Interval = 2000;
+            chromeTimer.Tick += ChromeTimer_Tick;
+            chromeTimer.Start();
+
+        }
+
+        /// <summary>
+        /// Determines, from the name of a tab, whether we should be concerned
+        /// </summary>
+        bool isTabCheating(string name)
+        {
+            var lower = name.ToLower();
+            foreach(var phrase in Program.BannedPhrases)
+            {
+                if(lower.Contains(phrase))
+                {
+                    Console.WriteLine($"Tab '{name}' is prohibited!");
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        string getReference(int number)
+        {
+            return Convert.ToBase64String(BitConverter.GetBytes(number));
+        }
+
+
+        List<int> blockedProcesses = new List<int>();
+        bool checkChrome(out string list, out List<int> processes)
+        {
+            list = "";
+            processes = new List<int>();
+            Process[] procsChrome = Process.GetProcessesByName("chrome");
+            if (procsChrome.Length <= 0)
+            {
+                Console.WriteLine("Chrome is not running");
+            }
+            else
+            {
+                bool issue = false;
+                foreach (Process proc in procsChrome)
+                {
+                    if(blockedProcesses.Contains(proc.Id))
+                    {
+                        list += $">BLOCKED={proc.Id}<\r\n";
+                        issue = true;
+                    }
+                    // the chrome process must have a window 
+                    if (proc.MainWindowHandle == IntPtr.Zero)
+                    {
+                        continue;
+                    }
+                    AutomationElement root = AutomationElement.FromHandle(proc.MainWindowHandle);
+                    Condition condition = new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.TabItem);
+                    var tabs = root.FindAll(TreeScope.Descendants, condition);
+                    list += $">Process={proc.Id}<\r\n";
+                    var thisIssue = false;
+                    foreach (AutomationElement tab in tabs)
+                    {
+                        if (isTabCheating(tab.Current.Name))
+                        {
+                            issue = true;
+                            thisIssue = true;
+                            list += "BLOCKED: ";
+                        }
+                        list += $"{tab.Current.Name}\r\n";
+                    }
+                    if (thisIssue)
+                    {
+                        processes.Add(proc.Id);
+                        blockedProcesses.Add(proc.Id);
+                    }
+                }
+                return issue;
+            }
+            return false;
+        }
+
+        bool hasTriggered = false;
+        void performAntiCheatChecks()
+        {
+            var watch = new Stopwatch();
+            Console.WriteLine("Beginning checks...");
+            watch.Start();
+            try
+            {
+                if(checkChrome(out string ls, out var lsProcesses))
+                {
+                    if(!hasTriggered)
+                        StartForm.API.UploadChromes(Encoding.UTF8.GetBytes(ls));
+                    setBlock("Please close any internet browser sessions\r\n\r\n" +
+                        string.Join("\r\n- ", lsProcesses.Select(x => getReference(x))) + "\r\n----\r\n" +
+                        ls);
+                    return;
+                }
+                // All is good, reset everything.
+                setBlock(null);
+                hasTriggered = false;
+                blockedProcesses = new List<int>();
+            }
+            catch
+            {
+                throw;
+            } finally
+            {
+                watch.Stop();
+                Console.WriteLine($"Checks took {watch.ElapsedMilliseconds}");
+            }
+        }
+
+        private void ChromeTimer_Tick(object sender, EventArgs e)
+        {
+            var th = new Thread(performAntiCheatChecks);
+            th.Start();
         }
 
         private void GameForm_MouseDoubleClick(object sender, MouseEventArgs e)

