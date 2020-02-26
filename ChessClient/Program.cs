@@ -21,11 +21,9 @@ namespace ChessClient
         // These phrases cannot appear in a chrome tab.
         public static string[] BannedPhrases = new string[]
         {
-            "chess calculator",
             "calculator",
-            "google search",
-            "search",
-            "chess online"
+            "chess",
+            "next move"
         };
 
         /// <summary>
