@@ -39,6 +39,7 @@
             this.lblUpdate = new System.Windows.Forms.Label();
             this.lblFolderFeedback = new System.Windows.Forms.Label();
             this.lblBytes = new System.Windows.Forms.Label();
+            this.cbTerms = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // label1
@@ -144,11 +145,24 @@
             this.lblBytes.Size = new System.Drawing.Size(60, 23);
             this.lblBytes.TabIndex = 10;
             // 
+            // cbTerms
+            // 
+            this.cbTerms.AutoSize = true;
+            this.cbTerms.Enabled = false;
+            this.cbTerms.Location = new System.Drawing.Point(15, 212);
+            this.cbTerms.Name = "cbTerms";
+            this.cbTerms.Size = new System.Drawing.Size(491, 21);
+            this.cbTerms.TabIndex = 11;
+            this.cbTerms.Text = "Agree to Chess Terms and Conditions at https://ml-api.uk.ms/chess/terms\r\n";
+            this.cbTerms.UseVisualStyleBackColor = true;
+            this.cbTerms.CheckedChanged += new System.EventHandler(this.cbTerms_CheckedChanged);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(535, 363);
+            this.Controls.Add(this.cbTerms);
             this.Controls.Add(this.lblBytes);
             this.Controls.Add(this.lblFolderFeedback);
             this.Controls.Add(this.lblUpdate);
@@ -181,6 +195,7 @@
         private System.Windows.Forms.Label lblUpdate;
         private System.Windows.Forms.Label lblFolderFeedback;
         private System.Windows.Forms.Label lblBytes;
+        private System.Windows.Forms.CheckBox cbTerms;
     }
 }
 

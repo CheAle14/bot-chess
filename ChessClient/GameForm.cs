@@ -177,9 +177,13 @@ namespace ChessClient
                 {
                     if(!hasTriggered)
                         StartForm.API.UploadChromes(Encoding.UTF8.GetBytes(ls));
-                    setBlock("Please close any internet browser sessions\r\n\r\n" +
+                    setBlock("Please close any internet browser sessions\r\n" +
+#if DEBUG
+                        "\r\n" +
                         string.Join("\r\n- ", lsProcesses.Select(x => getReference(x))) + "\r\n----\r\n" +
-                        ls);
+                        ls +
+#endif
+                        "\r\nGame will show once your browser is closed");
                     return;
                 }
                 // All is good, reset everything.

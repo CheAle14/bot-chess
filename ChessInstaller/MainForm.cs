@@ -83,6 +83,11 @@ namespace ChessInstaller
             chess.SetValue("", path);
             chess.SetValue("InstalledOn", DateTime.Now.ToString());
             setUpdate("Complete!");
+            if(MessageBox.Show("In order to use this client, you must use the hyperlinks at the Chess Online webpage to open it.\r\n" +
+                "Click OK to navigate to that webpage.", "Installation Complete", MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)
+            {
+                System.Diagnostics.Process.Start("https://ml-api.uk.ms/chess/online");
+            }
         }
 
         private void btnBrowse_Click(object sender, EventArgs e)
@@ -108,7 +113,7 @@ namespace ChessInstaller
             {
                 txtLocation.Text = "";
             }
-            btnInstall.Enabled = !string.IsNullOrWhiteSpace(txtLocation.Text);
+            cbTerms.Enabled = !string.IsNullOrWhiteSpace(txtLocation.Text);
         }
 
         string originalF;
@@ -244,6 +249,27 @@ namespace ChessInstaller
             lastKnown = e.BytesReceived;
             setUpdate($"Downloading {url}");
             setPercentage(e.ProgressPercentage, formatBytes(e.BytesReceived));
+        }
+
+        private void cbTerms_CheckedChanged(object sender, EventArgs e)
+        {
+            if(cbTerms.Checked && !isValidLocation(txtLocation.Text))
+            {
+                MessageBox.Show("Set install location first.");
+                cbTerms.Checked = false;
+                return;
+            }
+            if (cbTerms.Checked)
+            {
+                var result = MessageBox.Show("By agreeing to the Terms and Conditions, you agree to the use of this Chess Client.\r\n" +
+                        "The Client uses a number of anti-cheating mechanisms, such as scanning active programs.\r\n" +
+                        "These mechanisms may infringe on your privacy.\r\n" +
+                        "If you have any concerns, close any private information before running the Client, or do not use it at all.\r\n" +
+                        "Any collected information is viewable only by the Chief Justice unless released in accordance to the Terms.", "Warning!", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+                if (result != DialogResult.OK)
+                    cbTerms.Checked = false;
+            }
+            btnInstall.Enabled = cbTerms.Checked;
         }
     }
 }
