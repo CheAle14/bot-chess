@@ -368,9 +368,10 @@ namespace ChessClient
                 }
             } else if (ping.Id == PacketId.GameEnd)
             {
+                Game.Waiting = PlayerSide.None;
                 this.Invoke(new Action(() =>
                 {
-                    GameForm.Hide();
+                    GameForm.UpdateUI();
                 }));
                 if (ping.Content == null)
                     return;

@@ -36,6 +36,7 @@ namespace ChessClient
                 this.Text = $"You are {(Main.Self.Side == PlayerSide.None ? "spectating" : Main.Self.Side.ToString())}";
             }
             var wait = Main.Game?.Waiting ?? PlayerSide.None;
+            btnSurrender.Enabled = (wait != PlayerSide.None) && (Main.Self.Side != PlayerSide.None);
             lblWhite.ForeColor = wait == PlayerSide.White ? Color.Red : Color.FromKnownColor(KnownColor.ControlText);
             lblBlack.ForeColor = wait == PlayerSide.Black ? Color.Red : Color.FromKnownColor(KnownColor.ControlText);
             Main.AdminForm?.UpdateUI();
@@ -330,6 +331,11 @@ namespace ChessClient
             Main.Game.Waiting = (PlayerSide)((int)Main.Game.Waiting ^ 0b11);
             Board.Evaluate();
         }
-    
+
+        private void btnSurrender_Click(object sender, EventArgs e)
+        {
+            if(MessageBox.Show("Are you sure you want to raise the white flag?", "Confirm Resignation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+                StartForm.Send(new Packet(PacketId.ResignRequest, new JObject()));
+        }
     }
 }

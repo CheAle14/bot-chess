@@ -42,6 +42,11 @@ namespace ChessClient.Classes
         MoveRequest,
 
         /// <summary>
+        /// Client indicates they are resigning
+        /// </summary>
+        ResignRequest,
+
+        /// <summary>
         /// Requests full information of a <seealso cref="ChessPlayer"/>
         /// Content: <see cref="int"/> Id
         /// </summary>

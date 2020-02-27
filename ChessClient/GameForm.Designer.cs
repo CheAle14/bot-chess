@@ -30,6 +30,7 @@
         {
             this.lblWhite = new System.Windows.Forms.Label();
             this.lblBlack = new System.Windows.Forms.Label();
+            this.btnSurrender = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // lblWhite
@@ -52,11 +53,22 @@
             this.lblBlack.TabIndex = 1;
             this.lblBlack.Text = "label1";
             // 
+            // btnSurrender
+            // 
+            this.btnSurrender.Location = new System.Drawing.Point(826, 705);
+            this.btnSurrender.Name = "btnSurrender";
+            this.btnSurrender.Size = new System.Drawing.Size(100, 40);
+            this.btnSurrender.TabIndex = 2;
+            this.btnSurrender.Text = "Resign";
+            this.btnSurrender.UseVisualStyleBackColor = true;
+            this.btnSurrender.Click += new System.EventHandler(this.btnSurrender_Click);
+            // 
             // GameForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1038, 958);
+            this.Controls.Add(this.btnSurrender);
             this.Controls.Add(this.lblBlack);
             this.Controls.Add(this.lblWhite);
             this.Name = "GameForm";
@@ -72,5 +84,6 @@
 
         private System.Windows.Forms.Label lblWhite;
         private System.Windows.Forms.Label lblBlack;
+        public System.Windows.Forms.Button btnSurrender;
     }
 }

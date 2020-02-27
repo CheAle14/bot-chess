@@ -7,6 +7,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -97,8 +98,16 @@ namespace ChessInstaller
                 var r = client.GetAsync("https://api.github.com/repos/CheAle14/bot-chess/releases/latest").Result;
                 if (r.IsSuccessStatusCode)
                 {
-                    var jobj = Newtonsoft.Json.Linq.JObject.Parse(r.Content.ReadAsStringAsync().Result);
-                    return jobj["tag_name"].ToObject<string>();
+                    var str = r.Content.ReadAsStringAsync().Result;
+                    foreach(var line in str.Split(','))
+                    { // "tag_name":"v1.6"
+                        if(line.StartsWith("\"tag_name\""))
+                        {
+                            var version = line.Substring("'tag_name':".Length);
+                            return version.Replace("\"", "");
+                        }
+                    }
+                    return "v0.1";
                 }
                 else
                 {
@@ -109,7 +118,7 @@ namespace ChessInstaller
 
         public void continueRegistry()
         {
-            var path = Path.Combine(installLocation, "ChessInstall.exe");
+            var path = Path.Combine(installLocation, "ChessInstaller.exe");
             setUpdate("Registering web protocol");
             var main = Registry.CurrentUser.CreateSubKey("Software");
             var cls = main.CreateSubKey("Classes");
