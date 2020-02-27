@@ -21,74 +21,7 @@ namespace ChessInstaller
         {
             InitializeComponent();
         }
-
-        bool isValidLocation(string path)
-        {
-            if (string.IsNullOrWhiteSpace(path))
-                return false;
-            if(Directory.Exists(path))
-            {
-                var cont = Directory.GetFiles(path);
-                if (cont.Length > 0)
-                    return false;
-                var fold = Directory.GetDirectories(path);
-                if (fold.Length > 0)
-                    return false;
-            } else
-            {
-                try
-                {
-                    Directory.CreateDirectory(path);
-                } catch (Exception ex)
-                {
-                    MessageBox.Show(ex.ToString(), "Error");
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        void extractFiles()
-        {
-            if(this.InvokeRequired)
-            {
-                this.Invoke(new Action(() =>
-                {
-                    extractFiles();
-                }));
-                return;
-            }
-            setUpdate("Extracting files...");
-            ZipFile.ExtractToDirectory(downloadPath, txtLocation.Text);
-            setUpdate("Extracted");
-            continueRegistry();
-        }
-
-        void continueRegistry()
-        {
-            var path = Path.Combine(txtLocation.Text, "ChessClient.exe");
-            setUpdate("Registering web protocol");
-            var main = Registry.CurrentUser.CreateSubKey("Software");
-            var cls = main.CreateSubKey("Classes");
-            var key = cls.CreateSubKey("chess", true);
-            key.SetValue("", "URL:chess Protocol");
-            key.SetValue("URL Protocol", "");
-            var keyShell = key.CreateSubKey("shell");
-            var keyOpen = keyShell.CreateSubKey("open");
-            var keyCom = keyOpen.CreateSubKey("command");
-            keyCom.SetValue("", $"\"{path}\" \"%1\" \"%2\" \"%3\" \"%4\" \"%5\" \"%6\" \"%7\" \"%8\" \"%9\"");
-            setUpdate("Creating empty registry");
-            var empty = Registry.CurrentUser.CreateSubKey("CheAle14");
-            var chess = empty.CreateSubKey("ChessClient");
-            chess.SetValue("", path);
-            chess.SetValue("InstalledOn", DateTime.Now.ToString());
-            setUpdate("Complete!");
-            if(MessageBox.Show("In order to use this client, you must use the hyperlinks at the Chess Online webpage to open it.\r\n" +
-                "Click OK to navigate to that webpage.", "Installation Complete", MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)
-            {
-                System.Diagnostics.Process.Start("https://ml-api.uk.ms/chess/online");
-            }
-        }
+        public InstallProcess INSTALL;
 
         private void btnBrowse_Click(object sender, EventArgs e)
         {
@@ -101,7 +34,7 @@ namespace ChessInstaller
             var r = browser.ShowDialog();
             if(r == DialogResult.OK)
             {
-                if(isValidLocation(browser.SelectedPath))
+                if(InstallProcess.isValidLocation(browser.SelectedPath))
                 {
                     txtLocation.Text = browser.SelectedPath;
                 } else
@@ -167,9 +100,6 @@ namespace ChessInstaller
         }
 
         public WebClient Downloader;
-        string url = "https://github.com/CheAle14/bot-chess/releases/latest/download/Chess.zip";
-        string downloadPath = "";
-        long lastKnown;
 
         private void btnInstall_Click(object sender, EventArgs e)
         {
@@ -179,81 +109,41 @@ namespace ChessInstaller
                 uninstall();
             } else
             {
-                if (!isValidLocation(txtLocation.Text))
+                if (!InstallProcess.isValidLocation(txtLocation.Text))
                     return;
                 btnInstall.Enabled = false;
-                install();
+                INSTALL = new InstallProcess(txtLocation.Text, x =>
+                {
+                    this.Invoke(new Action(() =>
+                    {
+                        lblUpdate.Text = x;
+                    }));
+                }, (y, z) =>
+                {
+                    this.Invoke(new Action(() =>
+                    {
+                        lblBytes.Text = z;
+                        pbBar.Value = y;
+                    }));
+                });
+                INSTALL.install();
             }
         }
 
         void uninstall()
         {
-            try
+            INSTALL = new InstallProcess(txtLocation.Text, x =>
             {
-                Directory.Delete(txtLocation.Text, true);
-            }
-            catch { }
-            var k = Registry.CurrentUser.OpenSubKey("Software").OpenSubKey("Classes", true);
-            try
-            {
-                k.DeleteSubKeyTree("chess");
-            }
-            catch { }
-            var che = Registry.CurrentUser.CreateSubKey("CheAle14");
-            che.DeleteSubKey("ChessClient");
-            setUpdate("Program uninstalled");
+                this.Invoke(new Action(() =>
+                {
+                    lblUpdate.Text = x;
+                }));
+            }, null);
+            INSTALL.unInstall();
         }
-
-        void install()
-        {
-            Downloader = new WebClient();
-            Downloader.DownloadProgressChanged += Downloader_DownloadProgressChanged;
-            Downloader.DownloadFileCompleted += Downloader_DownloadFileCompleted;
-            downloadPath = Path.Combine(Path.GetTempPath(), "Chess.zip");
-            Downloader.DownloadFileAsync(new Uri(url),
-                downloadPath);
-        }
-
-        private void Downloader_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
-        {
-            if(e.Cancelled || e.Error != null)
-            {
-                string err = null;
-                err = e.Error?.InnerException?.Message ?? err;
-                err = e.Error?.Message ?? "Cancelled";
-                setUpdate("Failed: " + err);
-            } else
-            {
-                setPercentage(100, formatBytes(lastKnown));
-                setUpdate("Download complee");
-                extractFiles();
-            }
-        }
-
-        string formatBytes(long bytes)
-        {
-            long gb = bytes / (1024 * 1024 * 1024);
-            if (gb > 0)
-                return $"{gb}GB";
-            long mb = bytes / (1024 * 1024);
-            if (mb > 0)
-                return $"{mb}MB";
-            long kb = bytes / (1024);
-            if (kb > 0)
-                return $"{kb}KB";
-            return $"{bytes}B";
-        }
-
-        private void Downloader_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
-        {
-            lastKnown = e.BytesReceived;
-            setUpdate($"Downloading {url}");
-            setPercentage(e.ProgressPercentage, formatBytes(e.BytesReceived));
-        }
-
         private void cbTerms_CheckedChanged(object sender, EventArgs e)
         {
-            if(cbTerms.Checked && !isValidLocation(txtLocation.Text))
+            if(cbTerms.Checked && !InstallProcess.isValidLocation(txtLocation.Text))
             {
                 MessageBox.Show("Set install location first.");
                 cbTerms.Checked = false;

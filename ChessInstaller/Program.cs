@@ -16,7 +16,10 @@ namespace ChessInstaller
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainForm());
+            var thing = new UpdateForm();
+            Application.Run(thing);
+            if(thing.Existing == false)
+                Application.Run(new MainForm());
         }
     }
 }
