@@ -181,6 +181,7 @@
             this.Controls.Add(this.btnScreenshotW);
             this.Name = "AdminForm";
             this.Text = "AdminForm";
+            this.VisibleChanged += new System.EventHandler(this.AdminForm_VisibleChanged);
             this.groupBox1.ResumeLayout(false);
             this.ResumeLayout(false);
 

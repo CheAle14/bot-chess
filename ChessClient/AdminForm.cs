@@ -123,5 +123,10 @@ namespace ChessClient
         {
             demandProcesses(Main.Game.Black);
         }
+
+        private void AdminForm_VisibleChanged(object sender, EventArgs e)
+        {
+            Program.SetVisibilityAll(this.Visible);
+        }
     }
 }
