@@ -13,6 +13,7 @@ namespace ChessClient
 #else
         public static bool DEBUG = false;
 #endif
+        static StartForm form;
 
         public static string[] BannedProcesses = new string[]
         { // TODO: find things to ban.
@@ -26,6 +27,25 @@ namespace ChessClient
             "next move"
         };
 
+        public static void SetVisibilityAll(bool setting)
+        {
+            foreach(Form frm in new Form[] { form, form.GameForm, form.AdminForm})
+            {
+                if (frm == null)
+                    continue;
+                frm.Visible = setting;
+            }
+        }
+
+        public static void CloseAll()
+        {
+            foreach(Form frm in new Form[] { form?.GameForm, form?.AdminForm, form})
+            { // form last to close.
+                frm?.Close();
+            }
+            Environment.Exit(0);
+        }
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -34,7 +54,8 @@ namespace ChessClient
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new StartForm());
+            form = new StartForm();
+            Application.Run(form);
         }
     }
 }

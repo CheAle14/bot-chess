@@ -354,5 +354,15 @@ namespace ChessClient
             if(MessageBox.Show("Are you sure you want to raise the white flag?", "Confirm Resignation", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
                 StartForm.Send(new Packet(PacketId.ResignRequest, new JObject()));
         }
+
+        private void GameForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Program.CloseAll();
+        }
+
+        private void GameForm_VisibleChanged(object sender, EventArgs e)
+        {
+            Program.SetVisibilityAll(this.Visible);
+        }
     }
 }

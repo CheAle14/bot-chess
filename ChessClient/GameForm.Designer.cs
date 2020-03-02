@@ -73,7 +73,9 @@
             this.Controls.Add(this.lblWhite);
             this.Name = "GameForm";
             this.Text = "GameForm";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.GameForm_FormClosed);
             this.Load += new System.EventHandler(this.GameForm_Load);
+            this.VisibleChanged += new System.EventHandler(this.GameForm_VisibleChanged);
             this.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.GameForm_MouseDoubleClick);
             this.ResumeLayout(false);
             this.PerformLayout();
