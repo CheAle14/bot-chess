@@ -328,6 +328,23 @@ namespace ChessClient
                 fromBtn.PieceHere.Location = toBtn;
             fromBtn.PieceHere = null;
             toBtn.PieceHere.HasMoved = true;
+            Main.Game.LastMoves[toBtn.PieceHere.Owner] = new Move()
+            {
+                From = fromBtn,
+                To = toBtn,
+                Piece = toBtn.PieceHere
+            };
+            if(ping.Content.TryGetValue("remove", out var token))
+            {
+                var ids = token.ToObject<int[]>();
+                foreach(var id in ids)
+                {
+                    var thing = Board.GetPiece(id);
+                    if(thing.Location != null)
+                        thing.Location.PieceHere = null;
+                    thing.Location = null;
+                }
+            }
             Main.Game.Waiting = (PlayerSide)((int)Main.Game.Waiting ^ 0b11);
             Board.Evaluate();
         }

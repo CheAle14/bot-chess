@@ -375,6 +375,32 @@ namespace ChessClient.Classes
                     }
                 }
             }
+            // determine if we can enpassant capture:
+            foreach(var thing in new ChessButton[] { this.GetLeft(PieceHere.Owner), this.GetRight(PieceHere.Owner)})
+            { // opponent pawn would be by our side
+                // we need to check it is a pawn, and that the last move by opponent was to move this pawn two places.
+                if (thing == null)
+                    continue;
+                if (thing.PieceHere == null || thing.PieceHere.Type != PieceType.Pawn)
+                    continue;
+                if (thing.PieceHere.Owner == PieceHere.Owner)
+                    continue;
+                // get the opponent's last move.
+                var move = StartForm.INSTANCE.Game.LastMoves[PieceHere.Opponent];
+                if (move == null)
+                    continue; // opponent has made no moves, so obviously no enpassant
+                if(move.To.Name == thing.Name)
+                { // move was to this location, now we need to ensure it was two squares moved.
+                    var to = Board.GetPoint(move.To.Name);
+                    var from = Board.GetPoint(move.From.Name);
+                    int diffX = Math.Abs(to.X - from.X);
+                    int diffY = Math.Abs(to.Y - from.Y);
+                    if(diffY == 2 && diffX == 0)
+                    {
+                        thing.GetBack(PieceHere.Opponent).SetCanMove(PieceHere, highlight);
+                    }
+                }
+            }
         }
     }
 }

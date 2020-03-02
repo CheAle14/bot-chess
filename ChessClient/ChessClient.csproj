@@ -70,6 +70,7 @@
     <Compile Include="Classes\CircularQueue.cs" />
     <Compile Include="Classes\GameBoard.cs" />
     <Compile Include="Classes\IllegalStateException.cs" />
+    <Compile Include="Classes\Move.cs" />
     <Compile Include="Classes\TimeQueue.cs" />
     <Compile Include="Classes\MLAPI.cs" />
     <Compile Include="Classes\OnlineGame.cs" />

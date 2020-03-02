@@ -89,6 +89,7 @@ namespace ChessClient.Classes
         /// <summary>
         /// Informs Client to move a piece to a location
         /// Content: <see cref="string"/> From, To.
+        /// Content: Optionally: Remove, int[] of Piece Ids to remove from board as though they were taken
         /// </summary>
         MoveMade,
 

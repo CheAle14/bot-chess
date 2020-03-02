@@ -12,6 +12,12 @@ namespace ChessClient.Classes
         public ChessPlayer White { get; set; }
         public ChessPlayer Black { get; set; }
         public PlayerSide Waiting { get; set; }
+        public Dictionary<PlayerSide, Move> LastMoves = new Dictionary<PlayerSide, Move>()
+        {
+            { PlayerSide.White, null},
+            { PlayerSide.Black, null }
+        };
+
 
         public override void FromJson(JObject json)
         {
