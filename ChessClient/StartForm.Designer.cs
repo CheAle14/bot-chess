@@ -67,6 +67,7 @@
             this.Controls.Add(this.txtInput);
             this.Controls.Add(this.btnSend);
             this.Controls.Add(this.rtbChat);
+            this.KeyPreview = true;
             this.Name = "StartForm";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);

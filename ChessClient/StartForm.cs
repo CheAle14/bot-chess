@@ -22,9 +22,23 @@ namespace ChessClient
         public static MLAPI API;
         public GameForm GameForm;
         public AdminForm AdminForm;
+        private KeyHandler ghk;
         public StartForm()
         {
             InitializeComponent();
+            ghk = new KeyHandler(Keys.P, this);
+            ghk.Register();
+        }
+        private void HandleHotkey()
+        { // pause thing
+            Program.SetVisibilityAll(!this.Visible);
+        }
+
+        protected override void WndProc(ref Message m)
+        {
+            if (m.Msg == Constants.WM_HOTKEY_MSG_ID)
+                HandleHotkey();
+            base.WndProc(ref m);
         }
 
         public static StartForm INSTANCE;
