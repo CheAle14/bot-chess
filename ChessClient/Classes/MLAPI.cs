@@ -18,7 +18,7 @@ namespace ChessClient.Classes
         {
             Token = token;
             Client = new HttpClient();
-#if DEBUG
+#if DEBUG 
             Client.BaseAddress = new Uri($"http://localhost:8887/");
 #else
             Client.BaseAddress = new Uri($"https://ml-api.uk.ms/");

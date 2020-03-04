@@ -229,6 +229,9 @@ namespace ChessClient
             txtInput.Enabled = false;
 #endif
             var args = Environment.GetCommandLineArgs();
+#if DEBUG
+            MessageBox.Show(string.Join("\r\n", args), "Cli");
+#endif
             string cli = "";
             if(args.Length == 1)
             {
@@ -383,6 +386,7 @@ namespace ChessClient
             } else if (ping.Id == PacketId.GameEnd)
             {
                 Game.Waiting = PlayerSide.None;
+                Game.Ended = true;
                 this.Invoke(new Action(() =>
                 {
                     GameForm.UpdateUI();
@@ -397,16 +401,19 @@ namespace ChessClient
                 {
                     MessageBox.Show($"{player.Name} has won!");
                 }
-                this.Close();
+                this?.Close();
+                return;
             }
-            this.BeginInvoke(new Action(() =>
+            if (Game.Ended)
+                return;
+            this?.BeginInvoke(new Action(() =>
             {
                 if (GameForm == null)
                 {
                     GameForm = new GameForm(this);
                     GameForm.Show();
                 }
-                GameForm.UpdateUI();
+                GameForm?.UpdateUI();
                 if (ping.Id == PacketId.GameStatus)
                 {
                     Game.FromJson(ping.Content);

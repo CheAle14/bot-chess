@@ -63,7 +63,7 @@ namespace ChessInstaller
         void threadDoStuff()
         {
             var fullPath = (string)reg.GetValue("");
-            installPath = fullPath.Replace("ChessInstaller.exe", "").Replace("ChessClient.exe", "");
+            installPath = fullPath.Replace("ChessInstaller.exe", "").Replace("ChessClient.exe", "").Replace("ChessInstall.exe", "");
             string version = (string)reg.GetValue("Version");
             var installer = new InstallProcess(installPath, update, percentage);
             var latest = installer.getLatestVersion();
@@ -83,6 +83,7 @@ namespace ChessInstaller
             } else
             {
                 update($"Running latest ({latest}) no update needed");
+                Installer_Complete(null, null);
             }
         }
 
@@ -93,8 +94,19 @@ namespace ChessInstaller
                 this.Close();
             }));
             var args = Environment.GetCommandLineArgs();
-            if(args.Length > 1) // if via Chrome, will have additional args.
-                Process.Start(Path.Combine(installPath, "ChessClient.exe"), Environment.CommandLine);
+            if (args.Length > 1) // if via Chrome, will have additional args.
+            {
+                // we want to start client, but also to be safe we'll write the commandline
+                var txt = Path.Combine(installPath, "commandline.txt");
+                try
+                {
+                    File.WriteAllText(txt, args[1]);
+                } catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Non-critical exception.");
+                }
+                Process.Start(Path.Combine(installPath, "ChessClient.exe"), args[1]);
+            }
         }
     }
 }

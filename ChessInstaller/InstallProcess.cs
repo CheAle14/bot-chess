@@ -87,6 +87,10 @@ namespace ChessInstaller
             setUpdate("Extracting files...");
             ZipFile.ExtractToDirectory(downloadPath, installLocation);
             setUpdate("Extracted");
+            setUpdate("Copying installer...");
+            var to = Path.Combine(installLocation, "ChessInstaller.exe");
+            File.Copy(Environment.GetCommandLineArgs()[0], to, true);
+            setUpdate("Copied");
             continueRegistry();
         }
 

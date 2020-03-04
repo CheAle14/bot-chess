@@ -17,6 +17,7 @@ namespace ChessClient.Classes
             { PlayerSide.White, null},
             { PlayerSide.Black, null }
         };
+        public bool Ended { get; set; }
 
 
         public override void FromJson(JObject json)
