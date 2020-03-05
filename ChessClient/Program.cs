@@ -37,8 +37,12 @@ namespace ChessClient
             }
         }
 
+        static bool closing = false;
         public static void CloseAll()
         {
+            if (closing)
+                return;
+            closing = true;
             foreach(Form frm in new Form[] { form?.GameForm, form?.AdminForm, form})
             { // form last to close.
                 frm?.Close();

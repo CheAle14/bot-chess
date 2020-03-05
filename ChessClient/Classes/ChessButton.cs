@@ -62,7 +62,7 @@ namespace ChessClient.Classes
         {
             var coord = Board.GetPoint(this.Name);
             int direction = side == PlayerSide.White ? 1 : -1;
-            var newCoord = new Point(coord.X + (right * direction), coord.Y + (forward * direction));
+            var newCoord = new Point(coord.X + right, coord.Y + (forward * direction));
             return Board.GetButtonAt(newCoord);
         }
 
@@ -310,6 +310,70 @@ namespace ChessClient.Classes
             }
         }
 
+        void evalLeftCastle(bool highlight)
+        {
+            var rook = GetLeft(PieceHere.Owner, 4);
+            if (rook == null || rook.PieceHere == null || rook.PieceHere.HasMoved)
+                return;
+            // castle left moves king from Ex to Cx
+            var adjacant = GetLeft(PieceHere.Owner);
+            var final = adjacant.GetLeft(PieceHere.Owner);
+            // king cannot move through locations under threat, or non-empty.
+            foreach (var loc in new ChessButton[] { adjacant, final })
+            {
+                if (loc == null || loc.PieceHere != null || loc.Threats.HasFlag(PieceHere.Opponent))
+                    return;
+            }
+            // rook can move through threat, but must be empty
+            var next = final.GetLeft(PieceHere.Owner);
+            if (next == null || next.PieceHere != null)
+                return;
+            // if we get here then:
+            // a) King and rook are on player's starting rank
+            // b) Neither have moved
+            // c) No pieces between King and Rook
+            // d) King is not in threat
+            // e) King does not pass through a square in threat
+            // -> Hence: Castle is permitted.
+            final.SetCanMove(PieceHere, highlight);
+        }
+
+        void evalRightCastle(bool highlight)
+        {
+            var rook = GetRight(PieceHere.Owner, 3);
+            if (rook == null || rook.PieceHere == null || rook.PieceHere.HasMoved)
+                return;
+            // castle right moves king from Ex to Gx
+            var adjacant = GetRight(PieceHere.Owner);
+            var final = adjacant.GetRight(PieceHere.Owner);
+            // king cannot move through locations under threat, or non-empty.
+            foreach (var loc in new ChessButton[] { adjacant, final })
+            {
+                if (loc == null || loc.PieceHere != null || loc.Threats.HasFlag(PieceHere.Opponent))
+                    return;
+            }
+            // if we get here then:
+            // a) King and rook are on player's starting rank
+            // b) Neither have moved
+            // c) No pieces between King and Rook
+            // d) King is not in threat
+            // e) King does not pass through a square in threat
+            // -> Hence: Castle is permitted.
+            final.SetCanMove(PieceHere, highlight);
+        }
+
+        void evalCastle(bool highlight)
+        {
+            if (PieceHere.HasMoved)
+                return; // permenantly gives up if moved king.
+            if (this.Threats.HasFlag(PieceHere.Opponent))
+                return; // temporary inabiliy if threatened
+            if (this.GetPins(PieceHere.Opponent) != Pin.None)
+                return; // technically if pinned, should be threatened but just in case.
+            evalLeftCastle(highlight);
+            evalRightCastle(highlight);
+        }
+
         void evalKing(bool highlight)
         {
             var btns = new ChessButton[8];
@@ -339,6 +403,7 @@ namespace ChessClient.Classes
                     }
                 }
             }
+            evalCastle(highlight);
         }
 
         void evalPawn(bool highlight)
@@ -348,13 +413,15 @@ namespace ChessClient.Classes
                 return; // cant move at all
             var forward = this.GetForward(PieceHere.Owner);
             if (forward.PieceHere == null)
-                forward?.SetCanMove(PieceHere, highlight);
-            if (!PieceHere.HasMoved)
             {
-                var twice = forward?.GetForward(PieceHere.Owner);
-                if (twice?.PieceHere == null)
+                forward?.SetCanMove(PieceHere, highlight);
+                if (!PieceHere.HasMoved)
                 {
-                    twice?.SetCanMove(PieceHere, highlight);
+                    var twice = forward?.GetForward(PieceHere.Owner);
+                    if (twice?.PieceHere == null)
+                    {
+                        twice?.SetCanMove(PieceHere, highlight);
+                    }
                 }
             }
             // can move forward, but now we must verify vertical pins since we're aboutt to move off the file:
