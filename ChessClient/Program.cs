@@ -37,6 +37,11 @@ namespace ChessClient
             }
         }
 
+        public static object GetResource(string name)
+        {
+            return Properties.Resources.ResourceManager.GetObject(name);
+        }
+
         static bool closing = false;
         public static void CloseAll()
         {

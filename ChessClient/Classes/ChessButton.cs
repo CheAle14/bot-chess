@@ -26,6 +26,8 @@ namespace ChessClient.Classes
                 WhitePins |= pins;
             else
                 BlackPins |= pins;
+            if (this.FlatAppearance.BorderColor == getDefaultColor())
+                this.FlatAppearance.BorderColor = Color.Orange;
             return GetPins(side);
         }
 
@@ -40,7 +42,7 @@ namespace ChessClient.Classes
 
         public override Image BackgroundImage { get => base.BackgroundImage; set => base.BackgroundImage = value; }
 
-        Color getDefaultColor()
+        public Color getDefaultColor()
         {
             int code = ((int)this.Name[0]) - 65;
             int num = int.Parse(Name[1].ToString());
@@ -56,12 +58,14 @@ namespace ChessClient.Classes
             Threats = PlayerSide.None;
             this.BackgroundImage = PieceHere?.Image ?? null;
             this.BackgroundImageLayout = ImageLayout.Zoom;
+            if (this.FlatAppearance.BorderColor != Color.Red)
+                this.FlatAppearance.BorderColor = getDefaultColor();
         }
 
-        public ChessButton GetRelative(PlayerSide side, int right, int forward)
+        public ChessButton GetRelative(PlayerSide side, int right, int forward, bool absolute = false)
         {
             var coord = Board.GetPoint(this.Name);
-            int direction = side == PlayerSide.White ? 1 : -1;
+            int direction = absolute ? 1 : side == PlayerSide.White ? 1 : -1;
             var newCoord = new Point(coord.X + right, coord.Y + (forward * direction));
             return Board.GetButtonAt(newCoord);
         }
@@ -151,7 +155,7 @@ namespace ChessClient.Classes
                     {
                         if(!Board.CheckingKing.Contains(piece))
                             Board.CheckingKing.Add(piece);
-                        piece.Location.BackColor = Color.Purple;
+                        piece.Location.FlatAppearance.BorderColor = Color.Purple;
                     }
                     if(highlight)
                         this.BackColor = Color.Red;
@@ -200,7 +204,7 @@ namespace ChessClient.Classes
                 var currentlyPinning = direction[0] - direction[1] == 0 ? Pin.RightDiagonal : Pin.LeftDiagonal;
                 for (int i = 1; i <= 8; i++)
                 {
-                    var btnAt = GetRelative(PieceHere.Owner, i * direction[0], i * direction[1]);
+                    var btnAt = GetRelative(PieceHere.Owner, i * direction[0], i * direction[1], true);
                     if (btnAt == null)
                         continue;
                     if (btnAt.Name == this.Name)

@@ -85,7 +85,7 @@ namespace ChessClient.Classes
             Form = form;
             board = new ChessButton[8, 8];
             Size btnSize = new Size(64, 64);
-            int btnGap = 2;
+            int btnGap = 0;
             Point topLeft = new Point(100, 30);
             form.MinimumSize = new Size((btnSize.Width * 9) + (btnGap * 8) + topLeft.X,
                 (btnSize.Height * 9) + (btnGap * 8) + topLeft.Y);
@@ -94,6 +94,7 @@ namespace ChessClient.Classes
                 for(int x = 0; x <= 7; x++)
                 {
                     var btn = new ChessButton(this);
+                    btn.FlatStyle = FlatStyle.Flat;
                     btn.Name = GetReference(x, y);
                     btn.Size = btnSize;
                     int true_y = 8 - y;
@@ -101,6 +102,8 @@ namespace ChessClient.Classes
                         topLeft.Y + (true_y * btnSize.Height) + (true_y * btnGap));
                     btn.Text = btn.Name;
                     btn.BackColor = isGrey(x, y) ? Color.Gray : Color.FromKnownColor(KnownColor.Control);
+                    btn.FlatAppearance.BorderColor = btn.BackColor;
+                    btn.FlatAppearance.BorderSize = 3;
                     btn.Click += form.Btn_Click;
                     form.Controls.Add(btn);
                     board[x, y-1] = btn;

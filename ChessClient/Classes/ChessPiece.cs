@@ -20,6 +20,6 @@ namespace ChessClient.Classes
         public PieceType Type { get; set; }
         public ChessButton Location { get; set; }
         public bool HasMoved { get; set; }
-        public Image Image => (Image)Properties.Resources.ResourceManager.GetObject($"{Owner.ToString()[0]}_{Type}");
+        public Image Image => (Image)Program.GetResource($"{Owner.ToString()[0]}_{Type}");
     }
 }

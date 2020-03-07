@@ -43,6 +43,7 @@ namespace ChessClient
         }
 
         public StartForm Main;
+        public PromoteForm Promote;
         public GameBoard Board;
 
         System.Windows.Forms.Timer chromeTimer;
@@ -270,8 +271,23 @@ namespace ChessClient
                             MessageBox.Show("Your King is in Check!\nYou must defend your king.");
                             return;
                         }
-                        handlingMove = true;
+
                         var jobj = new JObject();
+                        if(firstClick.PieceHere.Type == PieceType.Pawn)
+                        {
+                            if((Main.Self.Side == PlayerSide.Black && btn.Name.EndsWith("1")) ||
+                                (Main.Self.Side == PlayerSide.White && btn.Name.EndsWith("8"))) {
+                                var promote = new PromoteForm(this);
+                                promote.ShowDialog();
+                                if(promote.Selected == PieceType.Pawn)
+                                {
+                                    MessageBox.Show("You must promote your pawn!");
+                                    return;
+                                }
+                                jobj["promote"] = (int)promote.Selected;
+                            }
+                        }
+                        handlingMove = true;
                         jobj["from"] = firstClick.Name;
                         jobj["to"] = btn.Name;
                         StartForm.Send(new Packet(PacketId.MoveRequest, jobj));
@@ -328,6 +344,24 @@ namespace ChessClient
                 fromBtn.PieceHere.Location = toBtn;
             fromBtn.PieceHere = null;
             toBtn.PieceHere.HasMoved = true;
+            if(Main.Game.LastMoves.TryGetValue(toBtn.PieceHere.Opponent, out var mv) && mv != null)
+            {
+                foreach(var btn in new ChessButton[] { mv.From, mv.To})
+                {
+                    btn.FlatAppearance.BorderColor = btn.getDefaultColor();
+                }
+            }
+            if (Main.Game.LastMoves.TryGetValue(toBtn.PieceHere.Owner, out mv) && mv != null)
+            {
+                foreach (var btn in new ChessButton[] { mv.From, mv.To })
+                {
+                    btn.FlatAppearance.BorderColor = btn.getDefaultColor();
+                }
+            }
+            foreach (var btn in new ChessButton[] { fromBtn, toBtn })
+            {
+                btn.FlatAppearance.BorderColor = Color.Red;
+            }
             Main.Game.LastMoves[toBtn.PieceHere.Owner] = new Move()
             {
                 From = fromBtn,
@@ -344,6 +378,20 @@ namespace ChessClient
                         thing.Location.PieceHere = null;
                     thing.Location = null;
                 }
+            }
+            if(ping.Content.TryGetValue("castle", out token))
+            {
+                var cFrom = Board.GetButtonAt(token["from"].ToObject<string>());
+                var cTo = Board.GetButtonAt(token["to"].ToObject<string>());
+                var piece = cFrom.PieceHere;
+                cFrom.PieceHere = null;
+                cTo.PieceHere = piece;
+                piece.Location = cTo;
+            }
+            if(ping.Content.TryGetValue("promote", out token))
+            {
+                var type = token.ToObject<PieceType>();
+                toBtn.PieceHere.Type = type;
             }
             Main.Game.Waiting = (PlayerSide)((int)Main.Game.Waiting ^ 0b11);
             Board.Evaluate();

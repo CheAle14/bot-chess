@@ -45,7 +45,8 @@ namespace ChessClient.Classes
                         {
                             piece.Location.PieceHere = null;
                         }
-                        var location = pieceMoved.ToObject<string>();
+                        var info = pieceMoved.ToObject<string>().Split('/');
+                        var location = info[0];
                         if(location == "null")
                         { // piece was taken
                             piece.Location = null;
@@ -53,6 +54,13 @@ namespace ChessClient.Classes
                         {
                             piece.Location = BOARD.GetButtonAt(location);
                             piece.Location.PieceHere = piece;
+                        }
+                        if(info.Length > 1)
+                        {
+                            if(Enum.TryParse<PieceType>(info[1], out var type))
+                            {
+                                piece.Type = type;
+                            }
                         }
                     }
                 }
