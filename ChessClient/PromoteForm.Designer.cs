@@ -76,19 +76,21 @@
             this.label1.TabIndex = 4;
             this.label1.Text = "Select Promotion";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // PromoteForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(320, 365);
+            this.ControlBox = false;
             this.Controls.Add(this.label1);
             this.Controls.Add(this.btnKnight);
             this.Controls.Add(this.btnRook);
             this.Controls.Add(this.btnBishop);
             this.Controls.Add(this.btnQueen);
             this.Name = "PromoteForm";
-            this.Text = "PromoteForm";
+            this.Text = "Promote a Pawn";
             this.Load += new System.EventHandler(this.PromoteForm_Load);
             this.ResumeLayout(false);
 

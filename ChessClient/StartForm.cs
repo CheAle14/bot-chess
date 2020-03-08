@@ -22,23 +22,23 @@ namespace ChessClient
         public static MLAPI API;
         public GameForm GameForm;
         public AdminForm AdminForm;
-        private KeyHandler ghk;
+        private GlobalKeyboardHook _globalKeyboardHook;
         public StartForm()
         {
             InitializeComponent();
-            ghk = new KeyHandler(Keys.P, this);
-            ghk.Register();
-        }
-        private void HandleHotkey()
-        { // pause thing
-            Program.SetVisibilityAll(!this.Visible);
+            _globalKeyboardHook = new GlobalKeyboardHook(new Keys[] { Keys.P });
+            _globalKeyboardHook.KeyboardPressed += _globalKeyboardHook_KeyboardPressed;
         }
 
-        protected override void WndProc(ref Message m)
+        private void _globalKeyboardHook_KeyboardPressed(object sender, GlobalKeyboardHookEventArgs e)
         {
-            if (m.Msg == Constants.WM_HOTKEY_MSG_ID)
-                HandleHotkey();
-            base.WndProc(ref m);
+            if(e.KeyboardState == GlobalKeyboardHook.KeyboardState.KeyUp) 
+            { 
+                if(ModifierKeys.HasFlag(Keys.Control))
+                {
+                    Program.SetVisibilityAll(!this.Visible);
+                }
+            }
         }
 
         public static StartForm INSTANCE;

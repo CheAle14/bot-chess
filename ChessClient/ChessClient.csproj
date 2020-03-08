@@ -87,7 +87,7 @@
     <Compile Include="GameForm.Designer.cs">
       <DependentUpon>GameForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="KeyHandler.cs" />
+    <Compile Include="KeyboardHook.cs" />
     <Compile Include="PromoteForm.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -140,7 +140,7 @@ namespace ChessClient.Classes
                 evalDiagonals(highlight);
         }
 
-        public void SetCanMove(ChessPiece piece, bool highlight)
+        public void SetCanMove(ChessPiece piece, bool highlight, bool threaten = true)
         {
             this.BackColor = getDefaultColor();
             if(PieceHere == null)
@@ -166,7 +166,8 @@ namespace ChessClient.Classes
             }
             if(!CanMoveHere.Contains(piece))
                 CanMoveHere.Add(piece);
-            Threats |= piece.Owner;
+            if(threaten)
+                Threats |= piece.Owner;
         }
 
         public override string Text
@@ -418,13 +419,13 @@ namespace ChessClient.Classes
             var forward = this.GetForward(PieceHere.Owner);
             if (forward.PieceHere == null)
             {
-                forward?.SetCanMove(PieceHere, highlight);
+                forward?.SetCanMove(PieceHere, highlight, false);
                 if (!PieceHere.HasMoved)
                 {
                     var twice = forward?.GetForward(PieceHere.Owner);
                     if (twice?.PieceHere == null)
                     {
-                        twice?.SetCanMove(PieceHere, highlight);
+                        twice?.SetCanMove(PieceHere, highlight, false);
                     }
                 }
             }

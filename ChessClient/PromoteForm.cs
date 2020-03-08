@@ -29,7 +29,9 @@ namespace ChessClient
                 {
                     var name = btn.Name.Substring("btn".Length);
                     var type = (PieceType)Enum.Parse(typeof(PieceType), name);
-                    btn.Image = (Image)Program.GetResource($"{Game.Main.Self.Side.ToString()[0]}_{type}");
+                    var side = Game?.Main?.Self?.Side.ToString()[0] ?? 'W';
+                    btn.BackgroundImage = (Image)Program.GetResource($"{side}_{type}");
+                    btn.BackgroundImageLayout = ImageLayout.Zoom;
                     btn.Tag = type;
                     btn.Click += Btn_Click;
                 }
@@ -43,6 +45,11 @@ namespace ChessClient
                 Selected = t;
                 this.Close();
             }
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
