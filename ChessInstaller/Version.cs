@@ -52,6 +52,9 @@ namespace ChessInstaller
                 return -1;
             }
 
+
+            if (AlphaV > 0 && other.AlphaV == 0)
+                return -1; // alpha versions obviously behind the actual release.
             if(AlphaV > other.AlphaV)
             {
                 return 1;
@@ -60,6 +63,8 @@ namespace ChessInstaller
                 return -1;
             }
 
+            if (BetaV > 0 && other.BetaV == 0)
+                return -1; // beta version also behind proper release
             if(BetaV > other.BetaV)
             {
                 return 1;
@@ -68,6 +73,7 @@ namespace ChessInstaller
                 return -1;
             }
 
+            // hotfixes however are ahead of proper release.
             if(HotFixV > other.HotFixV)
             {
                 return 1;
