@@ -85,8 +85,28 @@ namespace ChessInstaller
         public void extractFiles()
         {
             setUpdate("Extracting files...");
-            ZipFile.ExtractToDirectory(downloadPath, installLocation);
-            setUpdate("Extracted");
+            var extractPath = Path.Combine(Path.GetTempPath(), "chessExtract-3719");
+            try
+            {
+                Directory.Delete(extractPath, true);
+            } catch { }
+            try
+            {
+                Directory.CreateDirectory(extractPath);
+            } catch { }
+            ZipFile.ExtractToDirectory(downloadPath, extractPath);
+            setUpdate("Extracted: Copying files to folder.");
+            var files = Directory.GetFiles(extractPath);
+            foreach(var file in files)
+            {
+                try
+                {
+                    var fileName = Path.GetFileName(file);
+                    File.Move(file, Path.Combine(installLocation, fileName));
+                } catch (Exception ex)
+                {
+                }
+            }
             setUpdate("Copying installer...");
             var to = Path.Combine(installLocation, "ChessInstaller.exe");
             File.Copy(Environment.GetCommandLineArgs()[0], to, true);

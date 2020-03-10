@@ -71,6 +71,12 @@ namespace ChessClient.Classes
         /// </summary>
         RequestGameEnd,
 
+        /// <summary>
+        /// Client indicates they errored for logging purposes
+        /// Content: Information about the error.
+        /// </summary>
+        Errored,
+
         #endregion
 
         #region Server -> Client Messages

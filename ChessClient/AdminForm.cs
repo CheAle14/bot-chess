@@ -82,6 +82,11 @@ namespace ChessClient
 
         void makeWin(ChessPlayer winner) 
         {
+            if(MessageBox.Show($"Are you sure you want to make {(winner?.Name ?? "a draw")} win?", "Winner", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) 
+                != DialogResult.Yes)
+            {
+                return;
+            }
             setItems(false);
             int id = winner?.Id ?? -1;
             var jobj = new JObject();

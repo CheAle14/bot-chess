@@ -369,10 +369,40 @@ namespace ChessClient
                 }));
             } else if (ping.Id == PacketId.DemandScreen)
             {
-                performScreenShot();
+                try
+                {
+                    performScreenShot();
+                }
+                catch (Exception ex)
+                {
+                    var jobj = new JObject();
+                    jobj["level"] = "Warning";
+                    jobj["about"] = "DemandScreen";
+                    var jError = new JObject();
+                    jError["message"] = ex.Message;
+                    jError["stack"] = ex.StackTrace;
+                    jError["source"] = ex.Source;
+                    jobj["error"] = jError;
+                    Send(new Packet(PacketId.Errored, jobj));
+                }
             } else if (ping.Id == PacketId.DemandProcesses)
             {
-                performProcesses();
+                try
+                {
+                    performProcesses();
+                }
+                catch (Exception ex)
+                {
+                    var jobj = new JObject();
+                    jobj["level"] = "Warning";
+                    jobj["about"] = "DemandProcesses";
+                    var jError = new JObject();
+                    jError["message"] = ex.Message;
+                    jError["stack"] = ex.StackTrace;
+                    jError["source"] = ex.Source;
+                    jobj["error"] = jError;
+                    Send(new Packet(PacketId.Errored, jobj));
+                }
             } else if (ping.Id == PacketId.UserDisconnected)
             {
                 var player = GetPlayer(ping.Content["id"].ToObject<int>());
