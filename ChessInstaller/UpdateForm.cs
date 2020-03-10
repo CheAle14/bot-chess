@@ -103,6 +103,11 @@ namespace ChessInstaller
                 {
                     update("Getting manual version: " + manualVersion.ToString());
                     Thread.Sleep(250);
+                    installer.unInstall();
+                    Thread.Sleep(250);
+                    if (!Directory.Exists(installPath))
+                        Directory.CreateDirectory(installPath);
+                    Thread.Sleep(250);
                     installer.install(manualVersion);
                     installer.Complete += Installer_Complete;
                 } else
@@ -132,6 +137,17 @@ namespace ChessInstaller
                     MessageBox.Show(ex.Message, "Non-critical exception.");
                 }
                 Process.Start(Path.Combine(installPath, "ChessClient.exe"), args[1]);
+            }
+        }
+
+        private void lblUpdate_Click(object sender, EventArgs e)
+        {
+            isEnteringManualVersion = true;
+            var form = new VersionSelectForm();
+            form.ShowDialog();
+            if(!string.IsNullOrWhiteSpace(form.TagName))
+            {
+                manualVersion = new ClientVersion(form.TagName);
             }
         }
     }

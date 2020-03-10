@@ -23,6 +23,7 @@ namespace ChessInstaller
         string downloadPath = "";
         string url = "url://unknown";
         long lastKnown;
+        ClientVersion cVersion;
 
         public event EventHandler Complete;
 
@@ -35,6 +36,7 @@ namespace ChessInstaller
 
         public void install(ClientVersion version)
         {
+            cVersion = version;
             url = $"https://github.com/CheAle14/bot-chess/releases/download/{version}/Chess.zip";
             Downloader = new WebClient();
             Downloader.DownloadProgressChanged += Downloader_DownloadProgressChanged;
@@ -174,7 +176,7 @@ namespace ChessInstaller
             var chess = empty.CreateSubKey("ChessClient");
             chess.SetValue("", path);
             chess.SetValue("InstalledOn", DateTime.Now.ToString());
-            chess.SetValue("Version", getLatestVersion());
+            chess.SetValue("Version", cVersion.ToString());
             setUpdate("Complete!");
             if (MessageBox.Show("In order to use this client, you must use the hyperlinks at the Chess Online webpage to open it.\r\n" +
                 "Click OK to navigate to that webpage.", "Installation Complete", MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)

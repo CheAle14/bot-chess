@@ -126,7 +126,8 @@ namespace ChessInstaller
                         pbBar.Value = y;
                     }));
                 });
-                INSTALL.install();
+                var latest = INSTALL.getLatestVersion();
+                INSTALL.install(new ClientVersion(latest));
             }
         }
 
