@@ -92,7 +92,11 @@ namespace ChessClient.Classes
 
         protected override void OnPaint(PaintEventArgs pevent)
         {
-            base.OnPaint(pevent);
+            try
+            {
+                base.OnPaint(pevent);
+            }
+            catch { }
             if (!Program.DEBUG)
                 return;
             var pen = new Pen(Color.Red, 3);
@@ -245,6 +249,8 @@ namespace ChessClient.Classes
 
         void evalHorse(bool highlight)
         {
+            if (GetPins(PieceHere.Opponent) != Pin.None)
+                return; // cannot move under any pin.
             int[] topL = new int[] { -1, 2 };
             int[] topR = new int[] { 1, 2 };
             int[] rightU = new int[] { 2, 1 };
@@ -414,7 +420,7 @@ namespace ChessClient.Classes
         void evalPawn(bool highlight)
         {
             var pins = this.GetPins(PieceHere.Opponent);
-            if(pins.HasFlag(Pin.Horizontal) || pins.HasFlag(Pin.LeftDiagonal) || pins.HasFlag(Pin.RightDiagonal)) 
+            if(pins.HasFlag(Pin.Horizontal)) 
                 return; // cant move at all
             var forward = this.GetForward(PieceHere.Owner);
             if (forward.PieceHere == null)
@@ -436,6 +442,13 @@ namespace ChessClient.Classes
             var right = forward?.GetRight(PieceHere.Owner);
             foreach(var thing in new ChessButton[] { left, right})
             {
+                if(thing.Name == left.Name && pins.HasFlag(Pin.RightDiagonal))
+                { // cant move on the left since pinned.
+                    continue;
+                } else if (thing.Name == right.Name && pins.HasFlag(Pin.LeftDiagonal))
+                {
+                    continue;
+                }
                 if(thing != null)
                 {
                     if(thing.PieceHere != null)

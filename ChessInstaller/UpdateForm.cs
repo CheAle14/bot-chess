@@ -21,6 +21,8 @@ namespace ChessInstaller
             InitializeComponent();
         }
         public bool Existing;
+        public bool isEnteringManualVersion = false;
+        public ClientVersion manualVersion;
 
         string installPath = "";
         RegistryKey reg;
@@ -64,12 +66,20 @@ namespace ChessInstaller
         {
             var fullPath = (string)reg.GetValue("");
             installPath = fullPath.Replace("ChessInstaller.exe", "").Replace("ChessClient.exe", "").Replace("ChessInstall.exe", "");
-            string version = (string)reg.GetValue("Version");
+            var version = new ClientVersion((string)reg.GetValue("Version"));
             var installer = new InstallProcess(installPath, update, percentage);
-            var latest = installer.getLatestVersion();
-            update($"Current: {version}\r\nLatest: {latest}");
+            var latest = new ClientVersion(installer.getLatestVersion());
+            string delta = "";
+            int compare = version.CompareTo(latest);
+            if (compare == 0)
+                delta = "Up to date";
+            else if (compare < 0)
+                delta = "Outdated";
+            else
+                delta = "Newer";
+            update($"Current: {version}\r\nLatest: {latest}\r\n{delta}");
             Thread.Sleep(1500);
-            if(latest != version && latest != "v0.0")
+            if(compare < 0)
             { // remove everything
                 update("Updating...");
                 Thread.Sleep(250);
@@ -78,12 +88,28 @@ namespace ChessInstaller
                 if (!Directory.Exists(installPath))
                     Directory.CreateDirectory(installPath);
                 Thread.Sleep(250);
-                installer.install();
+                installer.install(latest);
                 installer.Complete += Installer_Complete;
             } else
             {
-                update($"Running latest ({latest}) no update needed");
-                Installer_Complete(null, null);
+                update("Hacking NASA and the NSA...");
+                Thread.Sleep(2500);
+                while (isEnteringManualVersion && manualVersion == null)
+                {
+                    update("Waiting manual version...");
+                    Thread.Sleep(500);
+                }
+                if(manualVersion != null)
+                {
+                    update("Getting manual version: " + manualVersion.ToString());
+                    Thread.Sleep(250);
+                    installer.install(manualVersion);
+                    installer.Complete += Installer_Complete;
+                } else
+                {
+                    update($"Running latest ({latest}) no update needed");
+                    Installer_Complete(null, null);
+                }
             }
         }
 

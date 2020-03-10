@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -19,8 +20,8 @@ namespace ChessInstaller
         Action<int, string> setPercentage;
         string installLocation;
         WebClient Downloader;
-        string url = "https://github.com/CheAle14/bot-chess/releases/latest/download/Chess.zip";
         string downloadPath = "";
+        string url = "url://unknown";
         long lastKnown;
 
         public event EventHandler Complete;
@@ -32,8 +33,9 @@ namespace ChessInstaller
             installLocation = location;
         }
 
-        public void install()
+        public void install(ClientVersion version)
         {
+            url = $"https://github.com/CheAle14/bot-chess/releases/download/{version}/Chess.zip";
             Downloader = new WebClient();
             Downloader.DownloadProgressChanged += Downloader_DownloadProgressChanged;
             Downloader.DownloadFileCompleted += Downloader_DownloadFileCompleted;
@@ -107,10 +109,24 @@ namespace ChessInstaller
                 {
                 }
             }
-            setUpdate("Copying installer...");
             var to = Path.Combine(installLocation, "ChessInstaller.exe");
-            File.Copy(Environment.GetCommandLineArgs()[0], to, true);
-            setUpdate("Copied");
+            var us = Environment.GetCommandLineArgs()[0];
+            if(us != to)
+            {
+                try
+                {
+                    setUpdate("Copying installer...");
+                    File.Copy(us, to, true);
+                    setUpdate("Copied");
+                }
+                catch (Exception ex) 
+                {
+                    setUpdate("Err: " + ex.Message);
+                    Thread.Sleep(1500);
+                    setUpdate("Continuing  ...");
+                    Thread.Sleep(500);
+                }
+            }
             continueRegistry();
         }
 
