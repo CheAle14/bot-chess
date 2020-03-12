@@ -41,6 +41,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.btnProcessB = new System.Windows.Forms.Button();
             this.btnProcessW = new System.Windows.Forms.Button();
+            this.btnUndoMove = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -126,7 +127,7 @@
             this.groupBox1.Controls.Add(this.btnWhiteWin);
             this.groupBox1.Controls.Add(this.btnBlackWin);
             this.groupBox1.Controls.Add(this.btnDraw);
-            this.groupBox1.Location = new System.Drawing.Point(12, 229);
+            this.groupBox1.Location = new System.Drawing.Point(12, 294);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(773, 96);
             this.groupBox1.TabIndex = 7;
@@ -166,11 +167,22 @@
             this.btnProcessW.UseVisualStyleBackColor = true;
             this.btnProcessW.Click += new System.EventHandler(this.btnProcessW_Click);
             // 
+            // btnUndoMove
+            // 
+            this.btnUndoMove.Location = new System.Drawing.Point(239, 226);
+            this.btnUndoMove.Name = "btnUndoMove";
+            this.btnUndoMove.Size = new System.Drawing.Size(324, 62);
+            this.btnUndoMove.TabIndex = 11;
+            this.btnUndoMove.Text = "Undo Last (side) Move";
+            this.btnUndoMove.UseVisualStyleBackColor = true;
+            this.btnUndoMove.Click += new System.EventHandler(this.btnUndoMove_Click);
+            // 
             // AdminForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 331);
+            this.ClientSize = new System.Drawing.Size(800, 400);
+            this.Controls.Add(this.btnUndoMove);
             this.Controls.Add(this.btnProcessB);
             this.Controls.Add(this.btnProcessW);
             this.Controls.Add(this.label1);
@@ -201,5 +213,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button btnProcessB;
         private System.Windows.Forms.Button btnProcessW;
+        private System.Windows.Forms.Button btnUndoMove;
     }
 }

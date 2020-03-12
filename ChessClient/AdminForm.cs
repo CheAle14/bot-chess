@@ -42,6 +42,8 @@ namespace ChessClient
             var wait = Main.Game?.Waiting ?? PlayerSide.None;
             lblWhite.ForeColor = wait == PlayerSide.White ? Color.Red : Color.FromKnownColor(KnownColor.ControlText);
             lblBlack.ForeColor = wait == PlayerSide.Black ? Color.Red : Color.FromKnownColor(KnownColor.ControlText);
+            btnUndoMove.Enabled = wait != PlayerSide.None;
+            btnUndoMove.Text = "Undo last (" + ((PlayerSide)((int)wait ^ 0b11)) + ") move";
         }
 
         void setItems(bool state)
@@ -132,6 +134,13 @@ namespace ChessClient
         private void AdminForm_VisibleChanged(object sender, EventArgs e)
         {
             Program.SetVisibilityAll(this.Visible);
+        }
+
+        private void btnUndoMove_Click(object sender, EventArgs e)
+        {
+            setItems(false);
+            StartForm.Send(new Packet(PacketId.RequestRevertMove, new JObject()));
+            resetTimer.Start();
         }
     }
 }

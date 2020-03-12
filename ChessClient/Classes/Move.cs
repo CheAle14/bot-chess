@@ -11,5 +11,6 @@ namespace ChessClient.Classes
         public ChessButton From;
         public ChessButton To;
         public ChessPiece Piece;
+        public ChessPiece Taken;
     }
 }

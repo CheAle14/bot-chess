@@ -59,6 +59,11 @@ namespace ChessClient.Classes
         RequestScreen,
 
         /// <summary>
+        /// Admin asks that the previous player's move be undone, and it be their turn again.
+        /// </summary>
+        RequestRevertMove,
+
+        /// <summary>
         /// Admin asks Server to demand list of processes.
         /// Content: Id of player.
         /// </summary>
@@ -98,6 +103,12 @@ namespace ChessClient.Classes
         /// Content: Optionally: Remove, int[] of Piece Ids to remove from board as though they were taken
         /// </summary>
         MoveMade,
+
+        /// <summary>
+        /// Informs Client that the given move has been reverted.
+        /// Content: <see cref="Move"/>
+        /// </summary>
+        MoveReverted,
 
         /// <summary>
         /// Orders the Client to reply how they are to promote a pawn

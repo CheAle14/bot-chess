@@ -337,6 +337,7 @@ namespace ChessClient
             var fromBtn = Board.GetButtonAt(from);
             var to = ping.Content["to"].ToObject<string>();
             var toBtn = Board.GetButtonAt(to);
+            ChessPiece taken = toBtn.PieceHere;
             if (toBtn.PieceHere != null)
                 toBtn.PieceHere.Location = null;
             toBtn.PieceHere = fromBtn.PieceHere;
@@ -366,7 +367,8 @@ namespace ChessClient
             {
                 From = fromBtn,
                 To = toBtn,
-                Piece = toBtn.PieceHere
+                Piece = toBtn.PieceHere,
+                Taken = taken
             };
             if(ping.Content.TryGetValue("remove", out var token))
             {
@@ -394,6 +396,33 @@ namespace ChessClient
                 toBtn.PieceHere.Type = type;
             }
             Main.Game.Waiting = (PlayerSide)((int)Main.Game.Waiting ^ 0b11);
+            Board.Evaluate();
+        }
+
+        public void RevertMove(Packet ping)
+        {
+            var ls = ping.Content["undo"].ToObject<List<string>>();
+            foreach(var undo in ls)
+            {
+                var split = undo.Split('@');
+                var id = int.Parse(split[0]);
+                var piece = Board.GetPiece(id);
+                var location = Board.GetButtonAt(split[1]);
+                location.PieceHere = piece;
+                if (piece.Location.PieceHere?.Id == piece.Id)
+                    piece.Location.PieceHere = null;
+                piece.Location = location;
+            }
+            if(ping.Content.TryGetValue("promote", out var prom))
+            {
+                var type = prom.ToObject<PieceType>();
+                var fromRef = ping.Content["from"].ToObject<string>();
+                var btn = Board.GetButtonAt(fromRef);
+                if(btn.PieceHere != null && btn.PieceHere.Type == type)
+                {
+                    btn.PieceHere.Type = PieceType.Pawn;
+                }
+            }
             Board.Evaluate();
         }
 

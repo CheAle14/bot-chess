@@ -433,6 +433,12 @@ namespace ChessClient
                 }
                 this?.Close();
                 return;
+            } else if (ping.Id == PacketId.MoveReverted)
+            {
+                this.Invoke(new Action(() =>
+                {
+                    GameForm.RevertMove(ping);
+                }));
             }
             if (Game.Ended)
                 return;
@@ -453,6 +459,8 @@ namespace ChessClient
                 if (GameForm.Visible == false)
                     GameForm.Show();
             }));
+            if (GameForm == null || GameForm.Board == null)
+                Thread.Sleep(500);
         }
 
         private void button1_Click(object sender, EventArgs e)

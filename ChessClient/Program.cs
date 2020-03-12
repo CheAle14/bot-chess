@@ -61,10 +61,16 @@ namespace ChessClient
         [STAThread]
         static void Main()
         {
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             form = new StartForm();
             Application.Run(form);
+        }
+
+        private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            Console.WriteLine("ERROR: " + e.ExceptionObject.ToString());
         }
     }
 }

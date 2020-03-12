@@ -442,21 +442,20 @@ namespace ChessClient.Classes
             var right = forward?.GetRight(PieceHere.Owner);
             foreach(var thing in new ChessButton[] { left, right})
             {
-                if(thing.Name == left.Name && pins.HasFlag(Pin.RightDiagonal))
+                if (thing == null)
+                    continue;
+                if(left != null && thing.Name == left.Name && pins.HasFlag(Pin.RightDiagonal))
                 { // cant move on the left since pinned.
                     continue;
-                } else if (thing.Name == right.Name && pins.HasFlag(Pin.LeftDiagonal))
+                } else if (right != null && thing.Name == right.Name && pins.HasFlag(Pin.LeftDiagonal))
                 {
                     continue;
                 }
-                if(thing != null)
+                if(thing.PieceHere != null)
                 {
-                    if(thing.PieceHere != null)
+                    if(thing.PieceHere.Owner != PieceHere.Owner)
                     {
-                        if(thing.PieceHere.Owner != PieceHere.Owner)
-                        {
-                            thing.SetCanMove(PieceHere, highlight);
-                        }
+                        thing.SetCanMove(PieceHere, highlight);
                     }
                 }
             }
