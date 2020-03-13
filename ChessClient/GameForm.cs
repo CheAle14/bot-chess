@@ -423,7 +423,9 @@ namespace ChessClient
                     btn.PieceHere.Type = PieceType.Pawn;
                 }
             }
+            Main.Game.Waiting = (PlayerSide)((int)Main.Game.Waiting ^ 0b11); // since we've undone their move
             Board.Evaluate();
+            UpdateUI();
         }
 
         private void btnSurrender_Click(object sender, EventArgs e)
