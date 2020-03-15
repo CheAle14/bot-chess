@@ -294,6 +294,7 @@ namespace ChessClient
                         handlingMove = true;
                         jobj["from"] = firstClick.Name;
                         jobj["to"] = btn.Name;
+                        timerUnlockButtons.Start();
                         StartForm.Send(new Packet(PacketId.MoveRequest, jobj));
                     }
                     firstClick = null;
@@ -337,6 +338,7 @@ namespace ChessClient
     
         public void AuthorativeMove(Packet ping)
         {
+            timerUnlockButtons.Stop();
             var from = ping.Content["from"].ToObject<string>();
             var fromBtn = Board.GetButtonAt(from);
             var to = ping.Content["to"].ToObject<string>();
@@ -482,6 +484,12 @@ namespace ChessClient
         private void panelDs_Paint(object sender, PaintEventArgs e)
         {
             ControlPaint.DrawBorder(e.Graphics, this.panelDs.ClientRectangle, Color.DarkBlue, ButtonBorderStyle.Solid);
+        }
+
+        private void timerUnlockButtons_Tick(object sender, EventArgs e)
+        {
+            timerUnlockButtons.Stop();
+            handlingMove = false;
         }
     }
 }

@@ -19,6 +19,7 @@ namespace ChessClient
         public static class Options
         {
             public static bool UseDiscord = true;
+            public static bool UseAntiCheat = true;
         }
         static void loadOptions()
         {
@@ -27,9 +28,17 @@ namespace ChessClient
             var fields = typeof(Options).GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
             foreach(var option in fields)
             {
-                var value = chess.GetValue(option.Name, null);
+                var value = (string)chess.GetValue(option.Name, null);
                 if (value != null)
-                    option.SetValue(null, value);
+                {
+                    if(option.FieldType == typeof(string))
+                    {
+                        option.SetValue(null, value);
+                    } else if (option.FieldType == typeof(bool))
+                    {
+                        option.SetValue(null, bool.Parse(value));
+                    }
+                }
             }
         }
         #endregion
@@ -341,6 +350,7 @@ namespace ChessClient
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             Console.WriteLine("ERROR: " + e.ExceptionObject.ToString());
+            MessageBox.Show(e.ExceptionObject.ToString(), "Unhandled Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 }

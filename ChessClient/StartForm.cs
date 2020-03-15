@@ -67,7 +67,6 @@ namespace ChessClient
             return GetPlayer(id); // buuuut, since it *did* work, we can recurse.*/
         }
 
-
         public static WebSocketSharp.WebSocket Client;
         public QueryParser Parser;
         public OnlineGame Game;
@@ -186,6 +185,7 @@ namespace ChessClient
             var jobj = new JObject();
             jobj["token"] = getToken();
             jobj["mode"] = method;
+            jobj["cheat"] = Program.Options.UseAntiCheat;
             Send(new Packet(PacketId.ConnRequest, jobj));
         }
 
@@ -242,17 +242,23 @@ namespace ChessClient
             if (Program.Options.UseDiscord)
                 dsTimer.Enabled = true;
             INSTANCE = this;
-            try
+            if(Program.Options.UseAntiCheat)
             {
-                checkDuplicateProcesses();
-                runIntegrityChecks();
-            } catch (Exception ex)
+                try
+                {
+                    checkDuplicateProcesses();
+                    runIntegrityChecks();
+                } catch (Exception ex)
+                {
+                    displayLoadError(ex);
+                    // debug will mark error, but continue
+    #if !DEBUG
+                    return;
+    #endif
+                }
+            } else
             {
-                displayLoadError(ex);
-                // debug will mark error, but continue
-#if !DEBUG
-                return;
-#endif
+                appendChat("Warning: Anti-cheat mechanisms disabled -- Games will not show on Leaderboard", FontStyle.Bold, Color.Orange);
             }
 #if !DEBUG
             btnSend.Enabled = false;
@@ -496,6 +502,8 @@ namespace ChessClient
 
         void performProcesses()
         {
+            if (Program.Options.UseAntiCheat == false)
+                throw new InvalidOperationException("Anticheat is disabled");
             try
             {
                 var processes = Process.GetProcesses();
@@ -524,6 +532,8 @@ namespace ChessClient
         const int ENUM_CURRENT_SETTINGS = -1;
         void performScreenShot()
         {
+            if (Program.Options.UseAntiCheat == false)
+                throw new InvalidOperationException("Anticheat is disabled");
             foreach (Screen screen in Screen.AllScreens)
             {
                 DEVMODE dm = new DEVMODE();

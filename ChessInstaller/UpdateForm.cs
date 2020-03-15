@@ -147,6 +147,9 @@ namespace ChessInstaller
                     MessageBox.Show(ex.Message, "Non-critical exception.");
                 }
                 Process.Start(Path.Combine(installPath, "ChessClient.exe"), command);
+            } else
+            {
+                this.Existing = false;
             }
         }
 

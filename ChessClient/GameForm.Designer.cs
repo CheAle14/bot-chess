@@ -28,13 +28,15 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.lblWhite = new System.Windows.Forms.Label();
             this.lblBlack = new System.Windows.Forms.Label();
             this.btnSurrender = new System.Windows.Forms.Button();
             this.panelDs = new System.Windows.Forms.Panel();
+            this.btnDsYes = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.lblDsUser = new System.Windows.Forms.Label();
-            this.btnDsYes = new System.Windows.Forms.Button();
+            this.timerUnlockButtons = new System.Windows.Forms.Timer(this.components);
             this.panelDs.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -80,6 +82,16 @@
             this.panelDs.Visible = false;
             this.panelDs.Paint += new System.Windows.Forms.PaintEventHandler(this.panelDs_Paint);
             // 
+            // btnDsYes
+            // 
+            this.btnDsYes.Location = new System.Drawing.Point(6, 73);
+            this.btnDsYes.Name = "btnDsYes";
+            this.btnDsYes.Size = new System.Drawing.Size(274, 37);
+            this.btnDsYes.TabIndex = 2;
+            this.btnDsYes.Text = "Accept";
+            this.btnDsYes.UseVisualStyleBackColor = true;
+            this.btnDsYes.Click += new System.EventHandler(this.btnDsYes_Click);
+            // 
             // label2
             // 
             this.label2.Location = new System.Drawing.Point(3, 44);
@@ -98,15 +110,10 @@
             this.lblDsUser.Text = "Name#Discrim";
             this.lblDsUser.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // btnDsYes
+            // timerUnlockButtons
             // 
-            this.btnDsYes.Location = new System.Drawing.Point(6, 73);
-            this.btnDsYes.Name = "btnDsYes";
-            this.btnDsYes.Size = new System.Drawing.Size(274, 37);
-            this.btnDsYes.TabIndex = 2;
-            this.btnDsYes.Text = "Accept";
-            this.btnDsYes.UseVisualStyleBackColor = true;
-            this.btnDsYes.Click += new System.EventHandler(this.btnDsYes_Click);
+            this.timerUnlockButtons.Interval = 10000;
+            this.timerUnlockButtons.Tick += new System.EventHandler(this.timerUnlockButtons_Tick);
             // 
             // GameForm
             // 
@@ -138,5 +145,6 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label lblDsUser;
         private System.Windows.Forms.Button btnDsYes;
+        private System.Windows.Forms.Timer timerUnlockButtons;
     }
 }

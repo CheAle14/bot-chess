@@ -67,7 +67,7 @@ namespace ChessInstaller
                 btnInstall.Enabled = true;
                 lblFolderFeedback.Text = "Location of previous install found";
             }
-
+            loadOptions();
             originalF = lblFolderFeedback.Text;
             pbBar.Maximum = 100;
         }
@@ -144,7 +144,9 @@ namespace ChessInstaller
         }
         private void cbTerms_CheckedChanged(object sender, EventArgs e)
         {
-            if(cbTerms.Checked && !InstallProcess.isValidLocation(txtLocation.Text))
+            if (!promptWarnings)
+                return;
+            if (cbTerms.Checked && !InstallProcess.isValidLocation(txtLocation.Text))
             {
                 MessageBox.Show("Set install location first.");
                 cbTerms.Checked = false;
@@ -163,6 +165,29 @@ namespace ChessInstaller
             btnInstall.Enabled = cbTerms.Checked;
         }
 
+        bool promptWarnings = false;
+        void loadOptions()
+        {
+            var empty = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("CheAle14");
+            var chess = empty.CreateSubKey("ChessClient");
+            foreach (var control in Controls)
+            {
+                if(control is CheckBox cb)
+                {
+                    if(cb.Name.StartsWith("cb"))
+                    {
+                        var value = chess.GetValue(cb.Name.Substring("cb".Length), cb.Checked);
+                        if(!(value is bool bVal))
+                        {
+                            bVal = bool.Parse((string)value);
+                        }
+                        cb.Checked = bVal;
+                    }
+                }
+            }
+            promptWarnings = true;
+        }
+
         void setOption(string name, object value)
         {
             var empty = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("CheAle14");
@@ -172,7 +197,22 @@ namespace ChessInstaller
 
         private void cbUseDiscord_CheckedChanged(object sender, EventArgs e)
         {
+            if (!promptWarnings)
+                return;
             setOption("UseDiscord", cbUseDiscord.Checked);
+        }
+
+        private void cbEnableAntiCheat_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!promptWarnings)
+                return;
+            setOption("UseAntiCheat", cbUseAntiCheat.Checked);
+            if(cbUseAntiCheat.Checked == false)
+            {
+                var r = MessageBox.Show("Disabling the anti-cheating mechanisms means any games you play in will not count towards or be added on the Leaderboard!", "Game Status: Invalid", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+                if (r == DialogResult.Cancel)
+                    cbUseAntiCheat.Checked = true;
+            }
         }
     }
 }
