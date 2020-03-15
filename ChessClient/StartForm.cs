@@ -43,6 +43,12 @@ namespace ChessClient
 
         public static StartForm INSTANCE;
 
+        public DateTime? JoinedAt = null;
+        public long GetTimestamp(DateTime time)
+        {
+            return ((DateTimeOffset)time).ToUnixTimeSeconds();
+        }
+
         public static Dictionary<int, ChessPlayer> Players = new Dictionary<int, ChessPlayer>();
 
         static AutoResetEvent getPlayerEvent = new AutoResetEvent(false);
@@ -464,6 +470,7 @@ namespace ChessClient
             {
                 if (GameForm == null)
                 {
+                    JoinedAt = DateTime.Now;
                     GameForm = new GameForm(this);
                     GameForm.Show();
                 }

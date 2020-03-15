@@ -154,6 +154,36 @@ namespace ChessClient
             };
         }
 
+        static Discord.ActivityAssets? getAssets()
+        {
+            if (form == null || form.GameForm == null || form.Game == null)
+                return null;
+            var ass = new Discord.ActivityAssets();
+            var wait = form.Game.Waiting;
+            ass.LargeImage = $"{wait.ToString().ToLower()[0]}_king";
+            var p = wait == Classes.PlayerSide.White ? form.Game.White : form.Game.Black;
+            ass.LargeText = $"{p?.Name}'s go";
+            if(form.Self != null && form.Self.Side != Classes.PlayerSide.None)
+            {
+                ass.SmallImage = $"{form.Self.Side.ToString().ToLower()[0]}_pawn";
+                ass.SmallText = $"Playing as {form.Self.Side}";
+            }
+            return ass;
+        }
+
+        static Discord.ActivityTimestamps? getTimestamps()
+        {
+#pragma warning disable CS1690 // Accessing a member on a field of a marshal-by-reference class may cause a runtime exception
+            if (form == null || form.GameForm == null || form.Game == null)
+                return null;
+            if (form.JoinedAt.HasValue == false)
+                return null;
+            var time = new Discord.ActivityTimestamps();
+            time.Start = form.GetTimestamp(form.JoinedAt.Value);
+#pragma warning restore CS1690 // Accessing a member on a field of a marshal-by-reference class may cause a runtime exception
+            return time;
+        }
+
         public static void setActivity()
         {
             var activityManager = DiscordClient.GetActivityManager();
@@ -172,7 +202,15 @@ namespace ChessClient
             var secrets = getSecrets();
             if (secrets.HasValue)
                 activity.Secrets = secrets.Value;
+            var ass = getAssets();
+            if (ass.HasValue)
+                activity.Assets = ass.Value;
+            var time = getTimestamps();
+            if (time.HasValue)
+                activity.Timestamps = time.Value;
+#if DEBUG
             Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(activity));
+#endif
             activityManager.UpdateActivity(activity, x =>
             {
                 DSLog(Discord.LogLevel.Info, $"Activity: {x}");
