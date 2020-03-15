@@ -233,8 +233,9 @@ namespace ChessClient
         #endregion
         private void Form1_Load(object sender, EventArgs e)
         {
+            if (Program.Options.UseDiscord)
+                dsTimer.Enabled = true;
             INSTANCE = this;
-            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             try
             {
                 checkDuplicateProcesses();
@@ -308,12 +309,6 @@ namespace ChessClient
                 GameForm = null;
             }));
         }
-
-        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
-        {
-            MessageBox.Show(((Exception)e.ExceptionObject).ToString());
-        }
-
 
         private void Client_OnMessage(object sender, WebSocketSharp.MessageEventArgs e)
         {

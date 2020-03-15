@@ -63,7 +63,6 @@
             // 
             // dsTimer
             // 
-            this.dsTimer.Enabled = true;
             this.dsTimer.Interval = 5000;
             this.dsTimer.Tick += new System.EventHandler(this.dsTimer_Tick);
             // 
