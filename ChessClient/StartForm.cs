@@ -43,7 +43,7 @@ namespace ChessClient
 
         public static StartForm INSTANCE;
 
-        static Dictionary<int, ChessPlayer> Players = new Dictionary<int, ChessPlayer>();
+        public static Dictionary<int, ChessPlayer> Players = new Dictionary<int, ChessPlayer>();
 
         static AutoResetEvent getPlayerEvent = new AutoResetEvent(false);
         public static ChessPlayer GetPlayer(int id)
@@ -123,6 +123,11 @@ namespace ChessClient
                 MessageBox.Show("Failed to get your identity. Please try again");
                 return;
             }
+            if(Parser.DeferToDiscord)
+            {
+                appendChat("Waiting for Discord to communicate what to do...", clr: Color.Blue);
+                return;
+            }
             StartMode mode = Parser.Mode;
             if (Parser.Mode == StartMode.Create)
             {
@@ -139,7 +144,25 @@ namespace ChessClient
                     return;
                 }
             }
+            joinWithMethod(mode == StartMode.Join ? "join" : "spectate");
+        }
 
+        string getToken()
+        {
+            if (!string.IsNullOrWhiteSpace(Parser.Token))
+                return Parser.Token;
+            var empty = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("CheAle14");
+            var chess = empty.CreateSubKey("ChessClient");
+            return (string)chess.GetValue("Token");
+        }
+
+        public void joinWithMethod(string method)
+        {
+            if(Client != null)
+            {
+                appendChat("Error: attempted to join again whilst already join(ed/ing)", clr: Color.Purple);
+                return;
+            }
             appendChat($"Joining game...", clr: Color.Blue);
 #if DEBUG
             Client = new WebSocketSharp.WebSocket($"ws://localhost:4650/chess");
@@ -155,8 +178,8 @@ namespace ChessClient
             Client.OnError += Client_OnError;
             Client.Connect();
             var jobj = new JObject();
-            jobj["token"] = Parser.Token;
-            jobj["mode"] = mode == StartMode.Join ? "join" : "spectate";
+            jobj["token"] = getToken();
+            jobj["mode"] = method;
             Send(new Packet(PacketId.ConnRequest, jobj));
         }
 
@@ -260,8 +283,8 @@ namespace ChessClient
                 cli = args[1];
             }
             Parser = new QueryParser(cli);
-            API = new MLAPI(Parser.Token);
-            appendChat($"Connecting to central server...", clr: Color.Blue);
+            API = new MLAPI(getToken());
+            appendChat($"Connecting to central server... ({API.Token})", clr: Color.Blue);
             var th = new Thread(initialConnect);
             th.Start();
         }
@@ -560,6 +583,22 @@ namespace ChessClient
             public int dmReserved2;
             public int dmPanningWidth;
             public int dmPanningHeight;
+        }
+
+        private void StartForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            Program.CloseAll();
+        }
+
+        bool setting = false;
+        private void dsTimer_Tick(object sender, EventArgs e)
+        {
+            if (setting)
+                return;
+            setting = true;
+            Program.DiscordClient.RunCallbacks();
+            Program.setActivity();
+            setting = false;
         }
     }
 }

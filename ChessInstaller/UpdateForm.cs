@@ -113,7 +113,7 @@ namespace ChessInstaller
                 } else
                 {
                     update($"Running latest ({latest}) no update needed");
-                    Installer_Complete(null, null);
+                    Installer_Complete(installer, null);
                 }
             }
         }
@@ -128,15 +128,25 @@ namespace ChessInstaller
             if (args.Length > 1) // if via Chrome, will have additional args.
             {
                 // we want to start client, but also to be safe we'll write the commandline
+                var command = args[1];
+                var splt = command.Substring("chess://".Length).Split('/');
+                var installer = (InstallProcess)sender;
+                if(splt.Length == 1)
+                { // we have no token, so lets try to use our stored one
+                    command += "/" + installer.getToken();
+                } else
+                {
+                    installer.setToken(splt[1]);
+                }
                 var txt = Path.Combine(installPath, "commandline.txt");
                 try
                 {
-                    File.WriteAllText(txt, args[1]);
+                    File.WriteAllText(txt, command);
                 } catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message, "Non-critical exception.");
                 }
-                Process.Start(Path.Combine(installPath, "ChessClient.exe"), args[1]);
+                Process.Start(Path.Combine(installPath, "ChessClient.exe"), command);
             }
         }
 

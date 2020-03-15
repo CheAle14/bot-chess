@@ -87,7 +87,9 @@ namespace ChessClient
             chromeTimer = new System.Windows.Forms.Timer();
             chromeTimer.Interval = 5000;
             chromeTimer.Tick += ChromeTimer_Tick;
+#if !DEBUG
             chromeTimer.Start();
+#endif
 
         }
 
@@ -209,6 +211,7 @@ namespace ChessClient
 
         private void ChromeTimer_Tick(object sender, EventArgs e)
         {
+#if !DEBUG
             var th = new Thread(performAntiCheatChecks);
             th.Start();
             if(times.Items % 2 == 0)
@@ -218,6 +221,7 @@ namespace ChessClient
                 if (times.Items > 30)
                     times.Items = 10; // prevent integer overflows. (technically.. shouldnt be massively likely)
             }
+#endif
         }
 
         private void GameForm_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -411,6 +415,8 @@ namespace ChessClient
                 location.PieceHere = piece;
                 if (piece.Location.PieceHere?.Id == piece.Id)
                     piece.Location.PieceHere = null;
+                if (split.ElementAtOrDefault(2) == "mv")
+                    piece.HasMoved = false;
                 piece.Location = location;
             }
             if(ping.Content.TryGetValue("promote", out var prom))
@@ -442,6 +448,40 @@ namespace ChessClient
         private void GameForm_VisibleChanged(object sender, EventArgs e)
         {
             Program.SetVisibilityAll(this.Visible);
+        }
+
+        public void ShowJoinRequest(Discord.User user)
+        {
+            if(this.InvokeRequired)
+            {
+                this.Invoke(new Action(() =>
+                {
+                    ShowJoinRequest(user);
+                }));
+                return;
+            }
+            panelDs.Show();
+            lblDsUser.Text = $"{user.Username}#{user.Discriminator}";
+            btnDsYes.Tag = user;
+        }
+
+        private void btnDsYes_Click(object sender, EventArgs e)
+        {
+            if (panelDs.Visible == false)
+                return;
+            if(btnDsYes.Tag is Discord.User user)
+            {
+                panelDs.Hide();
+                Program.DiscordClient.GetActivityManager().SendRequestReply(user.Id, Discord.ActivityJoinRequestReply.Yes, x =>
+                {
+                    Program.DSLog(Discord.LogLevel.Info, $"ReqApprove {user.Username}: {x}");
+                });
+            }
+        }
+
+        private void panelDs_Paint(object sender, PaintEventArgs e)
+        {
+            ControlPaint.DrawBorder(e.Graphics, this.panelDs.ClientRectangle, Color.DarkBlue, ButtonBorderStyle.Solid);
         }
     }
 }

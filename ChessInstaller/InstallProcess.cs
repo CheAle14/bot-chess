@@ -22,6 +22,7 @@ namespace ChessInstaller
         WebClient Downloader;
         string downloadPath = "";
         string url = "url://unknown";
+        string token = null;
         long lastKnown;
         ClientVersion cVersion;
 
@@ -158,6 +159,37 @@ namespace ChessInstaller
             }
         }
 
+        public void setToken(string t)
+        {
+            var empty = Registry.CurrentUser.CreateSubKey("CheAle14");
+            var chess = empty.CreateSubKey("ChessClient");
+            chess.SetValue("Token", getToken());
+            token = t;
+        }
+
+        public string getToken()
+        {
+            if(token == null)
+            {
+                var args = Environment.GetCommandLineArgs();
+                foreach(var arg in args)
+                {
+                    if(arg.StartsWith("chess://"))
+                    {
+                        var split = arg.Substring("chess://".Length).Split('/');
+                        token = split.ElementAtOrDefault(1);
+                    }
+                }
+                if(token == null)
+                {
+                    var empty = Registry.CurrentUser.CreateSubKey("CheAle14");
+                    var chess = empty.CreateSubKey("ChessClient");
+                    token = (string)chess.GetValue("Token", null);
+                }
+            }
+            return token;
+        }
+
         public void continueRegistry()
         {
             var path = Path.Combine(installLocation, "ChessInstaller.exe");
@@ -177,6 +209,7 @@ namespace ChessInstaller
             chess.SetValue("", path);
             chess.SetValue("InstalledOn", DateTime.Now.ToString());
             chess.SetValue("Version", cVersion.ToString());
+            chess.SetValue("Token", getToken());
             setUpdate("Complete!");
             if (MessageBox.Show("In order to use this client, you must use the hyperlinks at the Chess Online webpage to open it.\r\n" +
                 "Click OK to navigate to that webpage.", "Installation Complete", MessageBoxButtons.OKCancel, MessageBoxIcon.Information) == DialogResult.OK)

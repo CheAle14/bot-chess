@@ -40,6 +40,7 @@
             this.lblFolderFeedback = new System.Windows.Forms.Label();
             this.lblBytes = new System.Windows.Forms.Label();
             this.cbTerms = new System.Windows.Forms.CheckBox();
+            this.cbUseDiscord = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // label1
@@ -107,7 +108,7 @@
             // 
             this.btnInstall.Enabled = false;
             this.btnInstall.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnInstall.Location = new System.Drawing.Point(12, 239);
+            this.btnInstall.Location = new System.Drawing.Point(12, 254);
             this.btnInstall.Name = "btnInstall";
             this.btnInstall.Size = new System.Drawing.Size(511, 66);
             this.btnInstall.TabIndex = 6;
@@ -117,14 +118,14 @@
             // 
             // pbBar
             // 
-            this.pbBar.Location = new System.Drawing.Point(12, 334);
+            this.pbBar.Location = new System.Drawing.Point(12, 349);
             this.pbBar.Name = "pbBar";
             this.pbBar.Size = new System.Drawing.Size(511, 23);
             this.pbBar.TabIndex = 7;
             // 
             // lblUpdate
             // 
-            this.lblUpdate.Location = new System.Drawing.Point(12, 308);
+            this.lblUpdate.Location = new System.Drawing.Point(12, 323);
             this.lblUpdate.Name = "lblUpdate";
             this.lblUpdate.Size = new System.Drawing.Size(421, 23);
             this.lblUpdate.TabIndex = 8;
@@ -140,7 +141,7 @@
             // 
             // lblBytes
             // 
-            this.lblBytes.Location = new System.Drawing.Point(463, 308);
+            this.lblBytes.Location = new System.Drawing.Point(463, 323);
             this.lblBytes.Name = "lblBytes";
             this.lblBytes.Size = new System.Drawing.Size(60, 23);
             this.lblBytes.TabIndex = 10;
@@ -149,7 +150,7 @@
             // 
             this.cbTerms.AutoSize = true;
             this.cbTerms.Enabled = false;
-            this.cbTerms.Location = new System.Drawing.Point(15, 212);
+            this.cbTerms.Location = new System.Drawing.Point(15, 227);
             this.cbTerms.Name = "cbTerms";
             this.cbTerms.Size = new System.Drawing.Size(491, 21);
             this.cbTerms.TabIndex = 11;
@@ -157,11 +158,25 @@
             this.cbTerms.UseVisualStyleBackColor = true;
             this.cbTerms.CheckedChanged += new System.EventHandler(this.cbTerms_CheckedChanged);
             // 
+            // cbUseDiscord
+            // 
+            this.cbUseDiscord.AutoSize = true;
+            this.cbUseDiscord.Checked = true;
+            this.cbUseDiscord.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cbUseDiscord.Location = new System.Drawing.Point(15, 181);
+            this.cbUseDiscord.Name = "cbUseDiscord";
+            this.cbUseDiscord.Size = new System.Drawing.Size(203, 21);
+            this.cbUseDiscord.TabIndex = 12;
+            this.cbUseDiscord.Text = "Use Discord Rich Presence";
+            this.cbUseDiscord.UseVisualStyleBackColor = true;
+            this.cbUseDiscord.CheckedChanged += new System.EventHandler(this.cbUseDiscord_CheckedChanged);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(535, 363);
+            this.ClientSize = new System.Drawing.Size(535, 384);
+            this.Controls.Add(this.cbUseDiscord);
             this.Controls.Add(this.cbTerms);
             this.Controls.Add(this.lblBytes);
             this.Controls.Add(this.lblFolderFeedback);
@@ -196,6 +211,7 @@
         private System.Windows.Forms.Label lblFolderFeedback;
         private System.Windows.Forms.Label lblBytes;
         private System.Windows.Forms.CheckBox cbTerms;
+        private System.Windows.Forms.CheckBox cbUseDiscord;
     }
 }
 

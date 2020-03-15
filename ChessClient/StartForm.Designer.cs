@@ -28,9 +28,11 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.btnSend = new System.Windows.Forms.Button();
             this.rtbChat = new System.Windows.Forms.RichTextBox();
             this.txtInput = new System.Windows.Forms.TextBox();
+            this.dsTimer = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
             // btnSend
@@ -59,6 +61,12 @@
             this.txtInput.Size = new System.Drawing.Size(695, 22);
             this.txtInput.TabIndex = 2;
             // 
+            // dsTimer
+            // 
+            this.dsTimer.Enabled = true;
+            this.dsTimer.Interval = 5000;
+            this.dsTimer.Tick += new System.EventHandler(this.dsTimer_Tick);
+            // 
             // StartForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -69,6 +77,7 @@
             this.Controls.Add(this.rtbChat);
             this.KeyPreview = true;
             this.Name = "StartForm";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.StartForm_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -80,6 +89,7 @@
         private System.Windows.Forms.Button btnSend;
         private System.Windows.Forms.RichTextBox rtbChat;
         private System.Windows.Forms.TextBox txtInput;
+        private System.Windows.Forms.Timer dsTimer;
     }
 }
 

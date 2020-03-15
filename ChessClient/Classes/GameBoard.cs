@@ -71,6 +71,12 @@ namespace ChessClient.Classes
         public ChessButton GetButtonAt(Point ptn)
         {
             ChessButton btn = null;
+            if (ptn == null)
+                return null;
+            if (ptn.X > 7 || ptn.X < 0)
+                return null;
+            if (ptn.Y > 8 || ptn.Y < 1)
+                return null;
             try
             {
                 btn = board[ptn.X, ptn.Y - 1];

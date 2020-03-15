@@ -81,6 +81,13 @@
     <Compile Include="Classes\QueryParser.cs" />
     <Compile Include="Classes\StartMode.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="Discord\ActivityManager.cs" />
+    <Compile Include="Discord\Constants.cs" />
+    <Compile Include="Discord\Core.cs" />
+    <Compile Include="Discord\ImageManager.cs" />
+    <Compile Include="Discord\LobbyManager.cs" />
+    <Compile Include="Discord\StorageManager.cs" />
+    <Compile Include="Discord\StoreManager.cs" />
     <Compile Include="GameForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -145,6 +152,9 @@
     <Content Include="Resources\B_Pawn.png" />
     <Content Include="Resources\B_Queen.png" />
     <Content Include="Resources\B_Rook.png" />
+    <Content Include="discord_game_sdk.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\W_Bishop.png" />
     <Content Include="Resources\W_King.png" />
     <Content Include="Resources\W_Knight.png" />

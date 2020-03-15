@@ -162,5 +162,17 @@ namespace ChessInstaller
             }
             btnInstall.Enabled = cbTerms.Checked;
         }
+
+        void setOption(string name, object value)
+        {
+            var empty = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("CheAle14");
+            var chess = empty.CreateSubKey("ChessClient");
+            chess.SetValue(name, value);
+        }
+
+        private void cbUseDiscord_CheckedChanged(object sender, EventArgs e)
+        {
+            setOption("UseDiscord", cbUseDiscord.Checked);
+        }
     }
 }

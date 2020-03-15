@@ -22,8 +22,15 @@ namespace ChessClient.Classes
 
         public string GameId { get; private set; }
 
+        public bool DeferToDiscord { get; private set; }
+
         void parse()
         {
+            if(Argument.Contains("--discord"))
+            {
+                DeferToDiscord = true;
+                return;
+            }
             var strip = Argument.Substring("chess://".Length);
             var split = strip.Split('/');
             if(Enum.TryParse<StartMode>(split[0], true, out var mode))
