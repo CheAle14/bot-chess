@@ -37,6 +37,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.lblDsUser = new System.Windows.Forms.Label();
             this.timerUnlockButtons = new System.Windows.Forms.Timer(this.components);
+            this.btnDsRefuse = new System.Windows.Forms.Button();
             this.panelDs.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -72,12 +73,13 @@
             // 
             // panelDs
             // 
+            this.panelDs.Controls.Add(this.btnDsRefuse);
             this.panelDs.Controls.Add(this.btnDsYes);
             this.panelDs.Controls.Add(this.label2);
             this.panelDs.Controls.Add(this.lblDsUser);
             this.panelDs.Location = new System.Drawing.Point(743, 12);
             this.panelDs.Name = "panelDs";
-            this.panelDs.Size = new System.Drawing.Size(283, 119);
+            this.panelDs.Size = new System.Drawing.Size(283, 159);
             this.panelDs.TabIndex = 3;
             this.panelDs.Visible = false;
             this.panelDs.Paint += new System.Windows.Forms.PaintEventHandler(this.panelDs_Paint);
@@ -115,6 +117,16 @@
             this.timerUnlockButtons.Interval = 10000;
             this.timerUnlockButtons.Tick += new System.EventHandler(this.timerUnlockButtons_Tick);
             // 
+            // btnDsRefuse
+            // 
+            this.btnDsRefuse.Location = new System.Drawing.Point(6, 116);
+            this.btnDsRefuse.Name = "btnDsRefuse";
+            this.btnDsRefuse.Size = new System.Drawing.Size(274, 37);
+            this.btnDsRefuse.TabIndex = 3;
+            this.btnDsRefuse.Text = "Refuse";
+            this.btnDsRefuse.UseVisualStyleBackColor = true;
+            this.btnDsRefuse.Click += new System.EventHandler(this.btnDsRefuse_Click);
+            // 
             // GameForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -146,5 +158,6 @@
         private System.Windows.Forms.Label lblDsUser;
         private System.Windows.Forms.Button btnDsYes;
         private System.Windows.Forms.Timer timerUnlockButtons;
+        private System.Windows.Forms.Button btnDsRefuse;
     }
 }

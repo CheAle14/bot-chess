@@ -335,6 +335,14 @@ namespace ChessClient
             Board.Evaluate();
             return can;
         }
+
+        public void RefusedMove(Packet ping)
+        {
+            timerUnlockButtons.Stop();
+            MessageBox.Show(ping.Content["m"].ToObject<string>(),
+                ping.Content["t"].ToObject<string>(),
+                MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
     
         public void AuthorativeMove(Packet ping)
         {
@@ -490,6 +498,20 @@ namespace ChessClient
         {
             timerUnlockButtons.Stop();
             handlingMove = false;
+        }
+
+        private void btnDsRefuse_Click(object sender, EventArgs e)
+        {
+            if (panelDs.Visible == false)
+                return;
+            if (btnDsYes.Tag is Discord.User user)
+            {
+                panelDs.Hide();
+                Program.DiscordClient.GetActivityManager().SendRequestReply(user.Id, Discord.ActivityJoinRequestReply.No, x =>
+                {
+                    Program.DSLog(Discord.LogLevel.Info, $"ReqDeny {user.Username}: {x}");
+                });
+            }
         }
     }
 }

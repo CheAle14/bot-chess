@@ -161,6 +161,12 @@ namespace ChessClient.Classes
         /// </summary>
         GameEnd,
 
+        /// <summary>
+        /// Informs Client that their move request was invalid
+        /// Content: string Title, string Message
+        /// </summary>
+        MoveRequestRefuse,
+
         #endregion
 
         #region Multipurpose Messages

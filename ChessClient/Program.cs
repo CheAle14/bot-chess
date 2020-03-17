@@ -84,11 +84,6 @@ namespace ChessClient
                 frm?.Dispose();
             }
             form = null;
-            try
-            {
-                dsThread.Abort();
-            }
-            catch { }
             if(Options.UseDiscord)
             {
                 try
@@ -230,7 +225,7 @@ namespace ChessClient
         static void performDiscordStuffs()
         {
             System.Environment.SetEnvironmentVariable("DISCORD_INSTANCE_ID", PROGRAM_COUNTER.ToString());
-            DiscordClient = new Discord.Discord(CLIENT_ID, (ulong)Discord.CreateFlags.Default);
+            DiscordClient = new Discord.Discord(CLIENT_ID, (ulong)Discord.CreateFlags.NoRequireDiscord);
             var empty = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("CheAle14");
             var chess = empty.CreateSubKey("ChessClient");
             DiscordClient.SetLogHook(Discord.LogLevel.Debug, DSLog);
@@ -298,28 +293,6 @@ namespace ChessClient
                 return;
             }
             form.joinWithMethod("spectate");
-        }
-
-        static Thread dsThread;
-        static void dsUpdate()
-        {
-            Thread.Sleep(10 * 1000);
-            DSLog(Discord.LogLevel.Debug, "Starting callback loop");
-            while(form != null && form.Disposing == false && !closing)
-            {
-                /*try
-                {
-                    */DiscordClient.RunCallbacks();/*
-                } catch (NullReferenceException)
-                {
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    DSLog(Discord.LogLevel.Error, ex.ToString());
-                }*/
-                Thread.Sleep(500);
-            }
         }
 
         /// <summary>

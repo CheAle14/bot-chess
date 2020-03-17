@@ -346,6 +346,9 @@ namespace ChessClient
             if (ping.Id == PacketId.MoveMade)
             {
                 GameForm.AuthorativeMove(ping);
+            } else if (ping.Id == PacketId.MoveRequestRefuse)
+            {
+                GameForm.RefusedMove(ping);
             }
             else if (ping.Id == PacketId.PlayerIdent)
             {
@@ -605,10 +608,29 @@ namespace ChessClient
         bool setting = false;
         private void dsTimer_Tick(object sender, EventArgs e)
         {
+            if(Program.Options.UseDiscord == false)
+            {
+                dsTimer.Stop();
+                return;
+            }
             if (setting)
                 return;
             setting = true;
-            Program.DiscordClient.RunCallbacks();
+            try
+            {
+                Program.DiscordClient.RunCallbacks();
+            }
+            catch (Discord.ResultException ex)
+            {
+                if(ex.Message == "NotRunning")
+                {
+                    dsTimer.Stop();
+                    Program.DSLog(Discord.LogLevel.Error, "Discord not running");
+                } else
+                {
+                    throw;
+                }
+            }
             Program.setActivity();
             setting = false;
         }
