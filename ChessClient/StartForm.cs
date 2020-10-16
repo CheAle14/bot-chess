@@ -326,6 +326,7 @@ namespace ChessClient
         {
             if(GameForm != null)
                 GameForm.handlingMove = false;
+            Console.WriteLine(e.Data);
             var jobj = JObject.Parse(e.Data);
             var packet = new Packet(jobj["id"].ToObject<PacketId>(), JObject.Parse(jobj["content"].ToString()));
             this.BeginInvoke(new Action(() =>

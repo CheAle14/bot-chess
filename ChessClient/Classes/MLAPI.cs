@@ -24,13 +24,14 @@ namespace ChessClient.Classes
             Client.BaseAddress = new Uri($"https://ml-api.uk.ms/");
 #endif
             Client.DefaultRequestHeaders.Add("User-Agent", "bot-chess");
-            Client.DefaultRequestHeaders.Add("X-TOKEN", Token);
+            Client.DefaultRequestHeaders.Add("X-SESSION", Token);
         }
 
         public ChessPlayer GetIdentity()
         {
             var r = Client.GetAsync("/chess/api/identity").Result;
             var content = r.Content.ReadAsStringAsync().Result;
+            Console.WriteLine(content);
             if(!r.IsSuccessStatusCode)
                 throw new APIException("GetIdentity", content);
             var player = JsonConvert.DeserializeObject<ChessPlayer>(content);

@@ -60,9 +60,17 @@ namespace ChessClient
                 }));
                 return;
             }
-            blockLbl.Text = $"Game has been halted.\r\n{text ?? ""}";
-            hasTriggered = !string.IsNullOrWhiteSpace(text);
-            blockPanel.Visible = hasTriggered; 
+            if(Program.Options.UseAntiCheat)
+            {
+                blockLbl.Text = $"Game has been halted.\r\n{text ?? ""}";
+                hasTriggered = !string.IsNullOrWhiteSpace(text);
+                blockPanel.Visible = hasTriggered; 
+            } else
+            {
+                blockLbl.Text = "Anticheat disabled";
+                hasTriggered = false;
+                blockPanel.Visible = false;
+            }
         }
 
         private void GameForm_Load(object sender, EventArgs e)
@@ -88,7 +96,8 @@ namespace ChessClient
             chromeTimer.Interval = 5000;
             chromeTimer.Tick += ChromeTimer_Tick;
 #if !DEBUG
-            chromeTimer.Start();
+            if(Program.Options.UseAntiCheat)
+                chromeTimer.Start();
 #endif
 
         }

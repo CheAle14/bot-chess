@@ -29,7 +29,7 @@ namespace ChessInstaller
         private void UpdateForm_Load(object sender, EventArgs e)
         {
             reg = Registry.CurrentUser.CreateSubKey("CheAle14").CreateSubKey("ChessClient");
-            if(reg.ValueCount == 0)
+            if(reg.ValueCount == 0 || reg.GetValue("") == null)
             {
                 Existing = false;
                 this.Close();
@@ -41,7 +41,7 @@ namespace ChessInstaller
             th.Start();
         }
 
-        void update(string text)
+        public void update(string text)
         {
             if(this.InvokeRequired)
             {
@@ -49,6 +49,7 @@ namespace ChessInstaller
                 return;
             }
             lblUpdate.Text = text;
+            File.AppendAllText("log.txt", text + "\r\n");
         }
 
         void percentage(int val, string text)

@@ -83,6 +83,7 @@ namespace ChessInstaller
                 return;
             }
             lblUpdate.Text = text;
+            File.AppendAllText("log.txt", "mf: " + text + "\r\n");
         }
 
         void setPercentage(int perc, string additional)
@@ -112,13 +113,7 @@ namespace ChessInstaller
                 if (!InstallProcess.isValidLocation(txtLocation.Text))
                     return;
                 btnInstall.Enabled = false;
-                INSTALL = new InstallProcess(txtLocation.Text, x =>
-                {
-                    this.Invoke(new Action(() =>
-                    {
-                        lblUpdate.Text = x;
-                    }));
-                }, (y, z) =>
+                INSTALL = new InstallProcess(txtLocation.Text, setUpdate, (y, z) =>
                 {
                     this.Invoke(new Action(() =>
                     {
@@ -133,13 +128,7 @@ namespace ChessInstaller
 
         void uninstall()
         {
-            INSTALL = new InstallProcess(txtLocation.Text, x =>
-            {
-                this.Invoke(new Action(() =>
-                {
-                    lblUpdate.Text = x;
-                }));
-            }, null);
+            INSTALL = new InstallProcess(txtLocation.Text, setUpdate, null);
             INSTALL.unInstall();
         }
         private void cbTerms_CheckedChanged(object sender, EventArgs e)

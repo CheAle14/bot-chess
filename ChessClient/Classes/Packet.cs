@@ -21,7 +21,7 @@ namespace ChessClient.Classes
         {
             var jobj = new JObject();
             jobj["id"] = Id.ToString();
-            jobj["content"] = Content.ToString();
+            jobj["content"] = Content;
             return jobj.ToString();
         }
     }
@@ -170,7 +170,7 @@ namespace ChessClient.Classes
         #endregion
 
         #region Multipurpose Messages
-
+        Log
         #endregion
     }
 }
